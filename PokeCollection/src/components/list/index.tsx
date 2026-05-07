@@ -13,6 +13,7 @@ export function List({ data, onLoadMore }: any) {
       key={numColumns}
       data={data}
       numColumns={numColumns}
+      scrollEnabled={false}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <Card

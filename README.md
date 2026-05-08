@@ -56,7 +56,15 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
 
    ### 🌐 Verificando Pós Deploy Concluido
 
-  <img width="700" alt="image" src="https://github.com/user-attachments/assets/b27e7751-2f60-4bea-9f90-fcdb98705416" />
+  <img width="700" alt="Deploy Concluido" src="https://github.com/user-attachments/assets/b27e7751-2f60-4bea-9f90-fcdb98705416" />
+
+   ### 📱 Demonstrando diferentes layouts nos avisos em web e android
+
+  <img width="300" alt="Captura de tela 2026-05-08 160836" src="https://github.com/user-attachments/assets/bba68e06-e431-47d5-9355-65eb0cf4a818" /> 
+
+  <br> 
+  
+  <img width="300" alt="image" src="https://github.com/user-attachments/assets/42a21243-72f4-4a24-a44a-08c04b8e35eb" />
 
 </div>
 

@@ -4,6 +4,10 @@
 
 🔗 Acesse a aplicação: [pokecollectionreact.vercel.app](https://pokecollectionreact.vercel.app/)
 
+Nesta fase possuímos um login fixo
+
+🔒 ***user: estudante | senha: 1234*** 🔒
+
 </div>
 
 ## ✨ Objetivo do PokeCollection

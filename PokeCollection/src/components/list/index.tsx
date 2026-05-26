@@ -1,9 +1,20 @@
 import React from 'react';
 import { FlatList, useWindowDimensions } from 'react-native';
+
 import { styles } from './styles';
 import { Card } from '@/components/card';
 
-export function List({ data, onLoadMore }: any) {
+type ListProps = {
+  data: any[];
+  onLoadMore?: () => void;
+  renderItemContent?: (item: any) => React.ReactNode;
+};
+
+export function List({
+  data,
+  onLoadMore,
+  renderItemContent,
+}: ListProps) {
   const { width } = useWindowDimensions();
 
   const numColumns = width > 600 ? 2 : 1;
@@ -13,18 +24,24 @@ export function List({ data, onLoadMore }: any) {
       key={numColumns}
       data={data}
       numColumns={numColumns}
-      scrollEnabled={false}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => `${item.index}-${item.nome}`}
       renderItem={({ item }) => (
-        <Card
-          title={item.title}
-          description={item.description}
-          image={item.image}
-        />
+        <>
+          <Card
+            title={item.nome}
+            description={`#${item.index}`}
+            image={{ uri: item.imagem }}
+          />
+          {renderItemContent?.(item)}
+        </>
       )}
-      columnWrapperStyle={numColumns > 1 ? styles.row : undefined}
+      columnWrapperStyle={
+        numColumns > 1 ? styles.row : undefined
+      }
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
+      onEndReached={onLoadMore}
+      onEndReachedThreshold={0.5}
     />
   );
 }

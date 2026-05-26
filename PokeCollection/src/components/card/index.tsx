@@ -61,7 +61,7 @@ export function Card({ title, description, image }: CardProps) {
   }, []);
 
   // pega o tipo corretamente
-  const tipo = description.split(' ').pop();
+const tipo = description?.split(' ').pop() || 'Desconhecido';
 
   return (
     <Animated.View

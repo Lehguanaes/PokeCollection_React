@@ -11,7 +11,6 @@ export const styles = StyleSheet.create({
     gap: 15,
     margin: 12,
 
-    // Sombra multiplataforma
     ...(Platform.OS === 'web'
       ? {
           boxShadow: '0px 10px 20px rgba(0,0,0,0.12)',
@@ -45,10 +44,36 @@ export const styles = StyleSheet.create({
     color: Colors.subtitle,
   },
 
-  description: {
-    fontSize: 13,
-    color: Colors.text,
-    textAlign: 'center',
+  tags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+    justifyContent: 'center',
+  },
+
+  tag: {
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    minWidth: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    backgroundColor: 'transparent',
+
+    ...(Platform.OS === 'web'
+      ? {
+          transition: 'all 0.2s ease-in-out',
+          cursor: 'pointer',
+        }
+      : {}),
+  },
+
+  tagText: {
+    fontWeight: '700',
+    fontSize: 12,
+    textTransform: 'capitalize',
   },
 
   button: {

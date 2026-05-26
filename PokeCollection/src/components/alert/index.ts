@@ -1,6 +1,5 @@
 import { Platform } from "react-native";
 import { AlertProps } from "./types";
-
 import AlertIOS from "./index.ios";
 import AlertAndroid from "./index.android";
 import AlertWeb from "./index.web";

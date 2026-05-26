@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, Animated, Image, Text } from "react-native";
 import { styles } from "./styles";
 
+// Define o componente do rodapé com a animação dos pokémons
 export function Footer() {
   const translateX = useRef(new Animated.Value(0)).current;
 

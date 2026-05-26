@@ -8,8 +8,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 30,
     alignItems: 'center',
-
-    // 🖱️ transição suave (web)
     transitionDuration: '200ms',
   },
 
@@ -17,22 +15,18 @@ export const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: 'bold',
     fontSize: 16,
-
-    // 🖱️ transição no texto
     transitionDuration: '200ms',
   },
 
-  // 🖱️ HOVER
   hover: {
     backgroundColor: Colors.details,
     transform: [{ scale: 1.05 }],
   },
 
   textHover: {
-    color: '#000', // 🔥 texto fica preto
+    color: '#000',
   },
 
-  // 👆 CLICK
   pressed: {
     opacity: 0.85,
     transform: [{ scale: 0.97 }],

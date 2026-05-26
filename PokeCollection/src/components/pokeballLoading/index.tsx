@@ -1,9 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';//
-
-
-
-//import { Pokeball } from '@/components/pokeball';
+import { Animated, StyleSheet, View } from 'react-native';
+import { Pokeball } from '@/components/pokeball';
 import { Colors } from '@/constants/colors';
 
 const BALL_SIZE = 36;
@@ -27,7 +24,7 @@ function PulseBall({ delay }: { delay: number }) {
 
   return (
     <Animated.View style={{ opacity }}>
-      {/* <Pokeball size={BALL_SIZE} /> */}
+      <Pokeball size={BALL_SIZE} />
     </Animated.View>
   );
 }

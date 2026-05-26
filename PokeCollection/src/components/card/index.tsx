@@ -1,33 +1,35 @@
-import {
-  View,
-  Text,
-  Image,
-  Animated,
-  ImageSourcePropType,
-  Pressable,
-} from 'react-native';
+import { View, Text, Animated, ImageSourcePropType, Pressable, Platform, } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { styles } from './styles';
-
 import { Alert } from '@/components/alert';
+import { Poder } from '@/@types/pokemon';
+import { TYPE_ICONS, TYPE_COLORS } from '@/constants/pokemon';
 
 interface CardProps {
   title: string;
   description: string;
-  image: ImageSourcePropType;
+  image:
+    | ImageSourcePropType
+    | {
+        uri: string;
+      };
+  tipos?: string[];
+  poderes?: Poder[];
 }
 
-export function Card({ title, description, image }: CardProps) {
+export function Card({
+  title,
+  description,
+  image,
+  tipos = [],
+  poderes = [],
+}: CardProps) {
   const [visible, setVisible] = useState(false);
 
-  // animação flutuante da imagem
   const floatAnim = useRef(new Animated.Value(0)).current;
-
-  // animação leve do card
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // imagem flutuando
     Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {
@@ -43,7 +45,6 @@ export function Card({ title, description, image }: CardProps) {
       ])
     ).start();
 
-    // card respirando
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, {
@@ -60,14 +61,14 @@ export function Card({ title, description, image }: CardProps) {
     ).start();
   }, []);
 
-  // pega o tipo corretamente
-const tipo = description?.split(' ').pop() || 'Desconhecido';
-
   return (
     <Animated.View
-      style={[styles.card, { transform: [{ scale: scaleAnim }] }]}
+      style={[
+        styles.card,
+        { transform: [{ scale: scaleAnim }] },
+      ]}
     >
-      {/* IMAGEM */}
+      {/* IMAGE */}
       <View style={styles.imageContainer}>
         <Animated.Image
           source={image}
@@ -78,32 +79,90 @@ const tipo = description?.split(' ').pop() || 'Desconhecido';
         />
       </View>
 
-      {/* TEXTO */}
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
+      {/* TITLE */}
+      <Text style={[styles.title, { textAlign: 'center' }]}>
+        {title}
+      </Text>
 
-      {/* BOTÃO BONITO */}
+      {/* TYPES */}
+      <View style={styles.tags}>
+        {tipos.map((tipo) => {
+          const color = TYPE_COLORS[tipo];
+
+          return (
+            <Pressable
+              key={tipo}
+              style={({ hovered }) => ({
+                borderColor: color,
+                backgroundColor:
+                  Platform.OS === 'web' && hovered
+                    ? color
+                    : 'transparent',
+                paddingVertical: 7,
+                paddingHorizontal: 12,
+                borderRadius: 999,
+                borderWidth: 1.5,
+                minWidth: 80,
+                alignItems: 'center',
+              })}
+            >
+              {({ hovered }) => (
+                <Text
+                  style={{
+                    color:
+                      Platform.OS === 'web' && hovered
+                        ? '#fff'
+                        : color,
+                    fontWeight: '700',
+                    fontSize: 12,
+                  }}
+                >
+                  {TYPE_ICONS[tipo]} {tipo}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* BUTTON */}
       <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          pressed && { transform: [{ scale: 0.95 }] },
-        ]}
+        style={styles.button}
         onPress={() => setVisible(true)}
       >
-        <Text style={styles.buttonText}>Ver detalhes</Text>
+        <Text style={styles.buttonText}>
+          Ver detalhes
+        </Text>
       </Pressable>
 
       {/* ALERT */}
       <Alert
+        visible={visible}
+        onClose={() => setVisible(false)}
+        type="info"
         title={`🔎 ${title}`}
-        message={`📌 ${description}
+        message={`
+═══════════════════════
 
-        ⭐ Tipo: ${tipo}
-        🔥 Nível: Intermediário
-        🎯 Habilidade: Especial`}
-                type="info"
-                visible={visible}
-                onClose={() => setVisible(false)}
+TIPOS
+
+${tipos
+  .map((t) => `${TYPE_ICONS[t]} ${t}`)
+  .join(' | ')}
+
+═══════════════════════
+
+PODERES
+
+${poderes
+  .map(
+    (p) =>
+      `⚡ ${p.nome.replace('-', ' ').toUpperCase()} (${p.forca})`
+  )
+  .join(' | ')}
+
+═══════════════════════
+`}
       />
     </Animated.View>
   );

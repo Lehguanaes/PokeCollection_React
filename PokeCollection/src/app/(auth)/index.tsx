@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView, Text, Animated, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
-import { PokeballHeader } from "@/components/pokeballHeader";
+import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Alert } from "@/components/alert";
 import { Input } from "@/components/input";
@@ -178,7 +178,7 @@ export default function App() {
         false
       }
     >
-      <PokeballHeader />
+      <Header />
 
       <View style={styles.content}>
         <Animated.View

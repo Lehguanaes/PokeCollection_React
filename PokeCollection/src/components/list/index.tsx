@@ -1,11 +1,5 @@
 import React from 'react';
-
-import {
-  FlatList,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-
+import { FlatList, useWindowDimensions, View,} from 'react-native';
 import { styles } from './styles';
 
 type ListProps = {

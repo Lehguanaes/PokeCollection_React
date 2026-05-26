@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, } from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { List } from '@/components/list';
-import { PokeballHeader } from '@/components/pokeballHeader';
+import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { PokeballLoading } from '@/components/pokeballLoading';
 import { Colors } from '@/constants/colors';
@@ -90,7 +90,7 @@ export default function Pokedex() {
     <View style={styles.wrapper}>
       <BackgroundPokemons />
 
-      <PokeballHeader />
+      <Header />
 
       <Text
         style={
@@ -176,7 +176,7 @@ const styles =
       marginVertical: 12,
       borderRadius: 3,
     },
-    
+
     logoutButton: {
         backgroundColor: Colors.primary,
         paddingVertical: 12,

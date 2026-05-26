@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { styles } from "./styles";
 
 // Define o componente do cabeçalho da Pokebola
-export function PokeballHeader() {
+export function Header() {
   return (
     <View style={styles.container}>
       <View style={styles.topHalf} />

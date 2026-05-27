@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     },
 
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 10,
     },
 
     content: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
-        marginTop: 40,
+        marginTop: 30,
     },
 
     title: {
@@ -265,7 +265,6 @@ const styles = StyleSheet.create({
         color: Colors.subtitle,
         textAlign: 'center',
         fontWeight: 'bold',
-        marginBottom: 10,
     },
 
     line: {
@@ -287,8 +286,8 @@ const styles = StyleSheet.create({
 
         borderRadius: 40,
 
-        paddingVertical: 40,
-        paddingHorizontal: 40,
+        paddingVertical: 30,
+        paddingHorizontal: 30,
 
         borderWidth: 2,
         borderColor: Colors.inputBorder,
@@ -472,7 +471,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 2,
         backgroundColor: Colors.inputBorder,
-        marginVertical: 28,
+        marginVertical: 20,
     },
 
     /* GRID */

@@ -7,6 +7,7 @@ import { Alert } from "@/components/alert";
 import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 import { PokeballLoading } from "@/components/pokeballLoading";
+import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { useAuth } from "@/context/AuthContext";
 import { Colors } from "@/constants/colors";
 
@@ -178,6 +179,7 @@ export default function App() {
         false
       }
     >
+      <BackgroundPokemons />
       <Header />
 
       <View style={styles.content}>

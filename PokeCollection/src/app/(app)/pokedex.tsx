@@ -62,19 +62,15 @@ export default function Pokedex() {
           ) || [];
 
         return (
-          <Card
-            title={pokemon.nome}
-            description={`Tipos: ${tipos.join(
-              ', '
-            )}`}
-            image={{
-              uri: pokemon.imagem,
-            }}
-            tipos={tipos}
-            poderes={
-              pokemon.poderes
-            }
-          />
+        <Card
+          title={pokemon.nome}
+          image={{
+            uri: pokemon.imagem,
+          }}
+          tipos={tipos}
+          poderes={pokemon.poderes}
+          showDetailsButton
+        />
         );
       },
       []
@@ -123,7 +119,6 @@ export default function Pokedex() {
           }
         />
       </View>
-
       <Footer />
     </View>
   );

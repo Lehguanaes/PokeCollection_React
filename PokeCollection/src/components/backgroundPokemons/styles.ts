@@ -9,15 +9,15 @@ export const styles = StyleSheet.create({
 
     p1: {
         position: 'absolute',
-        top: 100,
-        left: 40,
+        top: 160,
+        left: 60,
         width: 150,
         height: 150,
     },
 
     p2: {
         position: 'absolute',
-        top: 170,
+        top: 240,
         right: 70,
         width: 180,
         height: 180,
@@ -25,15 +25,15 @@ export const styles = StyleSheet.create({
 
     p3: {
         position: 'absolute',
-        top: 370,
-        left: 70,
+        top: 470,
+        left: 90,
         width: 160,
         height: 160,
     },
 
     p4: {
         position: 'absolute',
-        top: 460,
+        top: 570,
         right: 140,
         width: 160,
         height: 160,

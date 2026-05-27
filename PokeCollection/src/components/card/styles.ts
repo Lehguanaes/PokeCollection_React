@@ -28,6 +28,8 @@ export const styles = StyleSheet.create({
     width: 170,
     height: 170,
     borderRadius: 80,
+    borderWidth: 3,
+    borderColor: Colors.details,
     backgroundColor: Colors.imageBackground,
     justifyContent: 'center',
     alignItems: 'center',

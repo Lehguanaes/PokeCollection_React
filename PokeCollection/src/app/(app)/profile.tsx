@@ -1,32 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { View,  Text, StyleSheet, Platform, Image, ScrollView, useWindowDimensions } from 'react-native';
+import React, {
+    useEffect,
+    useState,
+} from 'react';
+
+import {
+    View,
+    Text,
+    StyleSheet,
+    Platform,
+    Image,
+    ScrollView,
+    useWindowDimensions,
+    Pressable,
+} from 'react-native';
+
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { PokeballLoading } from '@/components/pokeballLoading';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
+
 import { Colors } from '@/constants/colors';
+
 import { useAuth } from '@/context/AuthContext';
 
-const isWeb = Platform.OS === 'web';
+const isWeb =
+    Platform.OS === 'web';
 
 const XP_TOTAL = 100;
 const XP_ATUAL = 12;
 
 export default function Perfil() {
-    const { user } = useAuth();
+    const { user } =
+        useAuth();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] =
+        useState(true);
 
-    const { width } = useWindowDimensions();
+    const { width } =
+        useWindowDimensions();
 
-    const isMobile = width < 768;
+    const isMobile =
+        width < 768;
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 1800);
+        const timer =
+            setTimeout(() => {
+                setLoading(false);
+            }, 1800);
 
-        return () => clearTimeout(timer);
+        return () =>
+            clearTimeout(timer);
     }, []);
 
     if (loading) {
@@ -40,8 +63,13 @@ export default function Perfil() {
             <Header />
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
+                style={styles.scroll}
+                contentContainerStyle={
+                    styles.scrollContent
+                }
+                showsVerticalScrollIndicator={
+                    false
+                }
             >
                 <Text style={styles.title}>
                     Perfil do {user}!
@@ -49,187 +77,363 @@ export default function Perfil() {
 
                 <View style={styles.line} />
 
-                <Text style={styles.subtitle}>
-                    Veja seus status e progresso! ✨
+                <Text
+                    style={styles.subtitle}
+                >
+                    Veja seus status e
+                    progresso! ✨
                 </Text>
 
-                <View style={styles.content}>
-
+                <View
+                    style={styles.content}
+                >
                     <View
                         style={[
                             styles.card,
                             {
-                                flexDirection: isMobile
-                                    ? 'column'
-                                    : 'row',
+                                flexDirection:
+                                    isMobile
+                                        ? 'column'
+                                        : 'row',
                             },
                         ]}
                     >
-
                         {/* ESQUERDA */}
                         <View
                             style={[
                                 styles.leftSection,
+
                                 isMobile && {
                                     width: '100%',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+
+                                    alignItems:
+                                        'center',
+
+                                    justifyContent:
+                                        'center',
+
                                     marginTop: 15,
                                 },
                             ]}
                         >
-                        <View style={styles.profileContent}>
-
-                            <View style={styles.glow} />
-
-                            <View style={styles.avatarWrapper}>
-
-                                <Image
-                                    source={require('../../../assets/images/icon.png')}
-                                    style={styles.avatar}
+                            <View
+                                style={
+                                    styles.profileContent
+                                }
+                            >
+                                <View
+                                    style={
+                                        styles.glow
+                                    }
                                 />
 
-                            </View>
+                                <View
+                                    style={
+                                        styles.avatarWrapper
+                                    }
+                                >
+                                    <Image
+                                        source={require('../../../assets/images/icon.png')}
+                                        style={
+                                            styles.avatar
+                                        }
+                                    />
+                                </View>
 
-                            <Text style={styles.name}>
-                                {user}
-                            </Text>
-
-                            <Text style={styles.role}>
-                                Caçador de Pokémons
-                            </Text>
-
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>
-                                    ⭐ Nível 12
+                                <Text
+                                    style={
+                                        styles.name
+                                    }
+                                >
+                                    {user}
                                 </Text>
-                            </View>
 
+                                <Text
+                                    style={
+                                        styles.role
+                                    }
+                                >
+                                    Caçador de
+                                    Pokémons
+                                </Text>
+
+                                <View
+                                    style={
+                                        styles.badge
+                                    }
+                                >
+                                    <Text
+                                        style={
+                                            styles.badgeText
+                                        }
+                                    >
+                                        ⭐ Nível
+                                        12
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                    </View>
+
                         {/* DIREITA */}
                         <View
                             style={[
                                 styles.rightSection,
+
                                 isMobile && {
                                     borderLeftWidth: 0,
+
                                     paddingLeft: 0,
+
                                     paddingTop: 10,
                                 },
                             ]}
                         >
-
                             {/* XP */}
-                            <View style={styles.statHeader}>
-
-                                <Text style={styles.statTitle}>
+                            <View
+                                style={
+                                    styles.statHeader
+                                }
+                            >
+                                <Text
+                                    style={
+                                        styles.statTitle
+                                    }
+                                >
                                     Experiência
                                 </Text>
 
-                                <Text style={styles.statValue}>
-                                    {XP_ATUAL}/{XP_TOTAL}
+                                <Text
+                                    style={
+                                        styles.statValue
+                                    }
+                                >
+                                    {
+                                        XP_ATUAL
+                                    }
+                                    /
+                                    {
+                                        XP_TOTAL
+                                    }
                                 </Text>
-
                             </View>
 
-                            <View style={styles.xpBarTrack}>
-
+                            <View
+                                style={
+                                    styles.xpBarTrack
+                                }
+                            >
                                 <View
                                     style={[
                                         styles.xpBarFill,
                                         {
-                                            width: `${(XP_ATUAL / XP_TOTAL) * 100}%` as any,
+                                            width: `${
+                                                (XP_ATUAL /
+                                                    XP_TOTAL) *
+                                                100
+                                            }%` as any,
                                         },
                                     ]}
                                 />
-
                             </View>
 
-                            <Text style={styles.xpText}>
-                                Faltam {XP_TOTAL - XP_ATUAL} XP para o próximo nível
+                            <Text
+                                style={
+                                    styles.xpText
+                                }
+                            >
+                                Faltam{' '}
+                                {XP_TOTAL -
+                                    XP_ATUAL}{' '}
+                                XP para o
+                                próximo nível
                             </Text>
 
-                            <View style={styles.statDivider} />
+                            <View
+                                style={
+                                    styles.statDivider
+                                }
+                            />
 
                             {/* GRID */}
-                            <View style={styles.grid}>
+                            <View
+                                style={[
+                                    styles.grid,
 
-                                <View style={styles.gridCard}>
+                                    isMobile && {
+                                        flexDirection:
+                                            'column',
 
-                                    <Text style={styles.gridEmoji}>
+                                        alignItems:
+                                            'center',
+                                    },
+                                ]}
+                            >
+                                <Pressable
+                                    style={({
+                                        hovered,
+                                    }) => [
+                                        styles.gridCard,
+
+                                        hovered &&
+                                            isWeb &&
+                                            styles.gridCardHover,
+
+                                        isMobile && {
+                                            width: '100%',
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={
+                                            styles.gridEmoji
+                                        }
+                                    >
                                         🏆
                                     </Text>
 
-                                    <Text style={styles.gridNumber}>
+                                    <Text
+                                        style={
+                                            styles.gridNumber
+                                        }
+                                    >
                                         8
                                     </Text>
 
-                                    <Text style={styles.gridLabel}>
+                                    <Text
+                                        style={
+                                            styles.gridLabel
+                                        }
+                                    >
                                         Vitórias
                                     </Text>
+                                </Pressable>
 
-                                </View>
+                                <Pressable
+                                    style={({
+                                        hovered,
+                                    }) => [
+                                        styles.gridCard,
 
-                                <View style={styles.gridCard}>
+                                        hovered &&
+                                            isWeb &&
+                                            styles.gridCardHover,
 
-                                    <Text style={styles.gridEmoji}>
+                                        isMobile && {
+                                            width: '100%',
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={
+                                            styles.gridEmoji
+                                        }
+                                    >
                                         💀
                                     </Text>
 
-                                    <Text style={styles.gridNumber}>
+                                    <Text
+                                        style={
+                                            styles.gridNumber
+                                        }
+                                    >
                                         2
                                     </Text>
 
-                                    <Text style={styles.gridLabel}>
+                                    <Text
+                                        style={
+                                            styles.gridLabel
+                                        }
+                                    >
                                         Derrotas
                                     </Text>
+                                </Pressable>
 
-                                </View>
+                                <Pressable
+                                    style={({
+                                        hovered,
+                                    }) => [
+                                        styles.gridCard,
 
-                                <View style={styles.gridCard}>
+                                        hovered &&
+                                            isWeb &&
+                                            styles.gridCardHover,
 
-                                    <Text style={styles.gridEmoji}>
+                                        isMobile && {
+                                            width: '100%',
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={
+                                            styles.gridEmoji
+                                        }
+                                    >
                                         ⚡
                                     </Text>
 
-                                    <Text style={styles.gridNumber}>
+                                    <Text
+                                        style={
+                                            styles.gridNumber
+                                        }
+                                    >
                                         151
                                     </Text>
 
-                                    <Text style={styles.gridLabel}>
+                                    <Text
+                                        style={
+                                            styles.gridLabel
+                                        }
+                                    >
                                         Pokémons
                                     </Text>
+                                </Pressable>
 
-                                </View>
+                                <Pressable
+                                    style={({
+                                        hovered,
+                                    }) => [
+                                        styles.gridCard,
 
-                                <View style={styles.gridCard}>
+                                        hovered &&
+                                            isWeb &&
+                                            styles.gridCardHover,
 
-                                    <Text style={styles.gridEmoji}>
+                                        isMobile && {
+                                            width: '100%',
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={
+                                            styles.gridEmoji
+                                        }
+                                    >
                                         🔥
                                     </Text>
 
-                                    <Text style={styles.gridNumber}>
+                                    <Text
+                                        style={
+                                            styles.gridNumber
+                                        }
+                                    >
                                         78%
                                     </Text>
 
-                                    <Text style={styles.gridLabel}>
+                                    <Text
+                                        style={
+                                            styles.gridLabel
+                                        }
+                                    >
                                         Progresso
                                     </Text>
-
-                                </View>
-
+                                </Pressable>
                             </View>
-
                         </View>
-
                     </View>
-
                 </View>
 
+                <Footer />
             </ScrollView>
-
-            <Footer />
-
         </View>
     );
 }
@@ -237,11 +441,16 @@ export default function Perfil() {
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: Colors.background,
+        backgroundColor:
+            Colors.background,
+    },
+
+    scroll: {
+        flex: 1,
     },
 
     scrollContent: {
-        paddingBottom: 10,
+        flexGrow: 1,
     },
 
     content: {
@@ -250,6 +459,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         marginTop: 30,
+        marginBottom: 40,
     },
 
     title: {
@@ -270,19 +480,19 @@ const styles = StyleSheet.create({
     line: {
         width: 360,
         height: 5,
-        backgroundColor: Colors.text,
+        backgroundColor:
+            Colors.text,
         alignSelf: 'center',
         marginVertical: 14,
         borderRadius: 20,
     },
 
-    /* CARD */
-
     card: {
         width: '100%',
         maxWidth: 1000,
 
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Colors.white,
 
         borderRadius: 40,
 
@@ -290,11 +500,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
 
         borderWidth: 2,
-        borderColor: Colors.inputBorder,
+        borderColor:
+            Colors.inputBorder,
 
-        shadowColor: Colors.black,
+        shadowColor:
+            Colors.black,
+
         shadowOpacity: 0.15,
+
         shadowRadius: 20,
+
         shadowOffset: {
             width: 0,
             height: 10,
@@ -308,21 +523,24 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
 
-    /* ESQUERDA */
-
     leftSection: {
-        width: isWeb ? 280 : '100%',
+        width: isWeb
+            ? 280
+            : '100%',
 
         alignItems: 'center',
         justifyContent: 'center',
 
         position: 'relative',
     },
-    
+
     profileContent: {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent:
+            'center',
+
         width: '100%',
+
         position: 'relative',
     },
 
@@ -334,7 +552,8 @@ const styles = StyleSheet.create({
 
         borderRadius: 999,
 
-        backgroundColor: Colors.secondary,
+        backgroundColor:
+            Colors.secondary,
 
         opacity: 0.18,
 
@@ -349,23 +568,32 @@ const styles = StyleSheet.create({
 
         position: 'relative',
 
-        justifyContent: 'center',
+        justifyContent:
+            'center',
+
         alignItems: 'center',
 
         borderRadius: 999,
 
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Colors.white,
 
         borderWidth: 4,
-        borderColor: Colors.details,
+
+        borderColor:
+            Colors.details,
 
         overflow: 'visible',
 
         zIndex: 2,
 
-        shadowColor: Colors.details,
+        shadowColor:
+            Colors.details,
+
         shadowOpacity: 0.35,
+
         shadowRadius: 15,
+
         shadowOffset: {
             width: 0,
             height: 6,
@@ -379,32 +607,45 @@ const styles = StyleSheet.create({
         height: 160,
     },
 
-    /* TEXTOS */
-
     name: {
-        fontSize: isWeb ? 34 : 28,
+        fontSize: isWeb
+            ? 34
+            : 28,
+
         fontWeight: '900',
+
         color: Colors.title,
+
         marginTop: 22,
+
         textAlign: 'center',
     },
 
     role: {
         fontSize: 14,
+
         color: Colors.subtitle,
+
         fontWeight: '700',
+
         marginTop: 8,
+
         letterSpacing: 1,
-        textTransform: 'uppercase',
+
+        textTransform:
+            'uppercase',
+
         textAlign: 'center',
     },
 
     badge: {
         marginTop: 18,
 
-        backgroundColor: Colors.details,
+        backgroundColor:
+            Colors.details,
 
         paddingHorizontal: 20,
+
         paddingVertical: 10,
 
         borderRadius: 999,
@@ -412,11 +653,11 @@ const styles = StyleSheet.create({
 
     badgeText: {
         color: Colors.gray[800],
+
         fontWeight: '800',
+
         fontSize: 14,
     },
-
-    /* DIREITA */
 
     rightSection: {
         flex: 1,
@@ -425,7 +666,10 @@ const styles = StyleSheet.create({
 
     statHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+
+        justifyContent:
+            'space-between',
+
         alignItems: 'center',
     },
 
@@ -445,7 +689,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 16,
 
-        backgroundColor: Colors.inputBorder,
+        backgroundColor:
+            Colors.inputBorder,
 
         borderRadius: 999,
 
@@ -456,7 +701,10 @@ const styles = StyleSheet.create({
 
     xpBarFill: {
         height: '100%',
-        backgroundColor: Colors.details,
+
+        backgroundColor:
+            Colors.details,
+
         borderRadius: 999,
     },
 
@@ -470,23 +718,28 @@ const styles = StyleSheet.create({
     statDivider: {
         width: '100%',
         height: 2,
-        backgroundColor: Colors.inputBorder,
+
+        backgroundColor:
+            Colors.inputBorder,
+
         marginVertical: 20,
     },
-
-    /* GRID */
 
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent:
+            'space-between',
         gap: 18,
     },
 
     gridCard: {
-        width: isWeb ? '47%' : '100%',
+        width: isWeb
+            ? '47%'
+            : '100%',
 
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Colors.white,
 
         borderRadius: 24,
 
@@ -496,18 +749,51 @@ const styles = StyleSheet.create({
         alignItems: 'center',
 
         borderWidth: 1,
-        borderColor: Colors.inputBorder,
 
-        shadowColor: Colors.black,
+        borderColor:
+            Colors.inputBorder,
+
+        shadowColor:
+            Colors.black,
+
         shadowOpacity: 0.05,
+
         shadowRadius: 10,
+
         shadowOffset: {
             width: 0,
             height: 4,
         },
 
         elevation: 4,
+
+        transitionDuration:
+            '200ms' as any,
     },
+
+gridCardHover: {
+    borderColor: '#FFD54A',
+
+    shadowColor: '#FFD54A',
+
+    shadowOpacity: 0.25,
+
+    shadowRadius: 12,
+
+    shadowOffset: {
+        width: 0,
+        height: 0,
+    },
+
+    elevation: 10,
+
+    ...(Platform.OS === 'web'
+        ? {
+              boxShadow:
+                  '0px 0px 18px rgba(255, 213, 74, 0.45)',
+          }
+        : {}),
+},
 
     gridEmoji: {
         fontSize: 32,

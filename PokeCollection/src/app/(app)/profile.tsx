@@ -1,457 +1,148 @@
-import React, {
-    useEffect,
-    useState,
-} from 'react';
-
-import {
-    View,
-    Text,
-    StyleSheet,
-    Platform,
-    Image,
-    ScrollView,
-    useWindowDimensions,
-    Pressable,
-} from 'react-native';
-
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Platform, Image, ScrollView, useWindowDimensions, Pressable } from 'react-native';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { PokeballLoading } from '@/components/pokeballLoading';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
-
 import { Colors } from '@/constants/colors';
-
 import { useAuth } from '@/context/AuthContext';
 
-const isWeb =
-    Platform.OS === 'web';
-
+const isWeb = Platform.OS === 'web';
 const XP_TOTAL = 100;
 const XP_ATUAL = 12;
 
 export default function Perfil() {
-    const { user } =
-        useAuth();
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const { width } = useWindowDimensions();
 
-    const [loading, setLoading] =
-        useState(true);
-
-    const { width } =
-        useWindowDimensions();
-
-    const isMobile =
-        width < 768;
+    const isMobile = width < 768;
 
     useEffect(() => {
-        const timer =
-            setTimeout(() => {
-                setLoading(false);
-            }, 1800);
-
-        return () =>
-            clearTimeout(timer);
+        const timer = setTimeout(() => setLoading(false), 1800);
+        return () => clearTimeout(timer);
     }, []);
 
-    if (loading) {
-        return <PokeballLoading />;
-    }
+    if (loading) return <PokeballLoading />;
 
     return (
         <View style={styles.wrapper}>
-            <BackgroundPokemons />
+        <BackgroundPokemons />
 
+        <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+        >
             <Header />
 
-            <ScrollView
-                style={styles.scroll}
-                contentContainerStyle={
-                    styles.scrollContent
-                }
-                showsVerticalScrollIndicator={
-                    false
-                }
+            <Text style={styles.title}>Perfil do {user}!</Text>
+            <View style={styles.line} />
+
+            <Text style={styles.subtitle}>
+            Veja seus status e progresso! ✨
+            </Text>
+
+            <View style={styles.content}>
+            <View
+                style={[
+                styles.card,
+                { flexDirection: isMobile ? 'column' : 'row' },
+                ]}
             >
-                <Text style={styles.title}>
-                    Perfil do {user}!
-                </Text>
-
-                <View style={styles.line} />
-
-                <Text
-                    style={styles.subtitle}
-                >
-                    Veja seus status e
-                    progresso! ✨
-                </Text>
-
+                {/* LEFT */}
                 <View
-                    style={styles.content}
+                style={[
+                    styles.leftSection,
+                    isMobile && styles.leftMobile,
+                ]}
                 >
-                    <View
-                        style={[
-                            styles.card,
-                            {
-                                flexDirection:
-                                    isMobile
-                                        ? 'column'
-                                        : 'row',
-                            },
-                        ]}
-                    >
-                        {/* ESQUERDA */}
-                        <View
-                            style={[
-                                styles.leftSection,
+                <View style={styles.profileContent}>
+                    <View style={styles.glow} />
 
-                                isMobile && {
-                                    width: '100%',
+                    <View style={styles.avatarWrapper}>
+                    <Image
+                        source={require('../../../assets/images/icon.png')}
+                        style={styles.avatar}
+                    />
+                    </View>
 
-                                    alignItems:
-                                        'center',
+                    <Text style={styles.name}>{user}</Text>
 
-                                    justifyContent:
-                                        'center',
+                    <Text style={styles.role}>Caçador de Pokémons</Text>
 
-                                    marginTop: 15,
-                                },
-                            ]}
-                        >
-                            <View
-                                style={
-                                    styles.profileContent
-                                }
-                            >
-                                <View
-                                    style={
-                                        styles.glow
-                                    }
-                                />
-
-                                <View
-                                    style={
-                                        styles.avatarWrapper
-                                    }
-                                >
-                                    <Image
-                                        source={require('../../../assets/images/icon.png')}
-                                        style={
-                                            styles.avatar
-                                        }
-                                    />
-                                </View>
-
-                                <Text
-                                    style={
-                                        styles.name
-                                    }
-                                >
-                                    {user}
-                                </Text>
-
-                                <Text
-                                    style={
-                                        styles.role
-                                    }
-                                >
-                                    Caçador de
-                                    Pokémons
-                                </Text>
-
-                                <View
-                                    style={
-                                        styles.badge
-                                    }
-                                >
-                                    <Text
-                                        style={
-                                            styles.badgeText
-                                        }
-                                    >
-                                        ⭐ Nível
-                                        12
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        {/* DIREITA */}
-                        <View
-                            style={[
-                                styles.rightSection,
-
-                                isMobile && {
-                                    borderLeftWidth: 0,
-
-                                    paddingLeft: 0,
-
-                                    paddingTop: 10,
-                                },
-                            ]}
-                        >
-                            {/* XP */}
-                            <View
-                                style={
-                                    styles.statHeader
-                                }
-                            >
-                                <Text
-                                    style={
-                                        styles.statTitle
-                                    }
-                                >
-                                    Experiência
-                                </Text>
-
-                                <Text
-                                    style={
-                                        styles.statValue
-                                    }
-                                >
-                                    {
-                                        XP_ATUAL
-                                    }
-                                    /
-                                    {
-                                        XP_TOTAL
-                                    }
-                                </Text>
-                            </View>
-
-                            <View
-                                style={
-                                    styles.xpBarTrack
-                                }
-                            >
-                                <View
-                                    style={[
-                                        styles.xpBarFill,
-                                        {
-                                            width: `${
-                                                (XP_ATUAL /
-                                                    XP_TOTAL) *
-                                                100
-                                            }%` as any,
-                                        },
-                                    ]}
-                                />
-                            </View>
-
-                            <Text
-                                style={
-                                    styles.xpText
-                                }
-                            >
-                                Faltam{' '}
-                                {XP_TOTAL -
-                                    XP_ATUAL}{' '}
-                                XP para o
-                                próximo nível
-                            </Text>
-
-                            <View
-                                style={
-                                    styles.statDivider
-                                }
-                            />
-
-                            {/* GRID */}
-                            <View
-                                style={[
-                                    styles.grid,
-
-                                    isMobile && {
-                                        flexDirection:
-                                            'column',
-
-                                        alignItems:
-                                            'center',
-                                    },
-                                ]}
-                            >
-                                <Pressable
-                                    style={({
-                                        hovered,
-                                    }) => [
-                                        styles.gridCard,
-
-                                        hovered &&
-                                            isWeb &&
-                                            styles.gridCardHover,
-
-                                        isMobile && {
-                                            width: '100%',
-                                        },
-                                    ]}
-                                >
-                                    <Text
-                                        style={
-                                            styles.gridEmoji
-                                        }
-                                    >
-                                        🏆
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridNumber
-                                        }
-                                    >
-                                        8
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridLabel
-                                        }
-                                    >
-                                        Vitórias
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable
-                                    style={({
-                                        hovered,
-                                    }) => [
-                                        styles.gridCard,
-
-                                        hovered &&
-                                            isWeb &&
-                                            styles.gridCardHover,
-
-                                        isMobile && {
-                                            width: '100%',
-                                        },
-                                    ]}
-                                >
-                                    <Text
-                                        style={
-                                            styles.gridEmoji
-                                        }
-                                    >
-                                        💀
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridNumber
-                                        }
-                                    >
-                                        2
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridLabel
-                                        }
-                                    >
-                                        Derrotas
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable
-                                    style={({
-                                        hovered,
-                                    }) => [
-                                        styles.gridCard,
-
-                                        hovered &&
-                                            isWeb &&
-                                            styles.gridCardHover,
-
-                                        isMobile && {
-                                            width: '100%',
-                                        },
-                                    ]}
-                                >
-                                    <Text
-                                        style={
-                                            styles.gridEmoji
-                                        }
-                                    >
-                                        ⚡
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridNumber
-                                        }
-                                    >
-                                        151
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridLabel
-                                        }
-                                    >
-                                        Pokémons
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable
-                                    style={({
-                                        hovered,
-                                    }) => [
-                                        styles.gridCard,
-
-                                        hovered &&
-                                            isWeb &&
-                                            styles.gridCardHover,
-
-                                        isMobile && {
-                                            width: '100%',
-                                        },
-                                    ]}
-                                >
-                                    <Text
-                                        style={
-                                            styles.gridEmoji
-                                        }
-                                    >
-                                        🔥
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridNumber
-                                        }
-                                    >
-                                        78%
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            styles.gridLabel
-                                        }
-                                    >
-                                        Progresso
-                                    </Text>
-                                </Pressable>
-                            </View>
-                        </View>
+                    <View style={styles.badge}>
+                    <Text style={styles.badgeText}>⭐ Nível 12</Text>
                     </View>
                 </View>
+                </View>
 
-                <Footer />
-            </ScrollView>
+                {/* RIGHT */}
+                <View
+                style={[
+                    styles.rightSection,
+                    isMobile && styles.rightMobile,
+                ]}
+                >
+                {/* XP */}
+                <View style={styles.statHeader}>
+                    <Text style={styles.statTitle}>Experiência</Text>
+                    <Text style={styles.statValue}>
+                    {XP_ATUAL}/{XP_TOTAL}
+                    </Text>
+                </View>
+
+                <View style={styles.xpBarTrack}>
+                    <View
+                    style={[
+                        styles.xpBarFill,
+                        { width: `${(XP_ATUAL / XP_TOTAL) * 100}%` },
+                    ]}
+                    />
+                </View>
+
+                <Text style={styles.xpText}>
+                    Faltam {XP_TOTAL - XP_ATUAL} XP para o próximo nível
+                </Text>
+
+                <View style={styles.statDivider} />
+
+                {/* GRID */}
+                <View style={[styles.grid, isMobile && styles.gridMobile]}>
+                    {[
+                    { emoji: '🏆', value: 8, label: 'Vitórias' },
+                    { emoji: '💀', value: 2, label: 'Derrotas' },
+                    { emoji: '⚡', value: 151, label: 'Pokémons' },
+                    { emoji: '🔥', value: '78%', label: 'Progresso' },
+                    ].map((item, i) => (
+                    <Pressable
+                        key={i}
+                        style={({ hovered }) => [
+                        styles.gridCard,
+                        hovered && isWeb && styles.gridCardHover,
+                        isMobile && styles.gridCardMobile,
+                        ]}
+                    >
+                        <Text style={styles.gridEmoji}>{item.emoji}</Text>
+                        <Text style={styles.gridNumber}>{item.value}</Text>
+                        <Text style={styles.gridLabel}>{item.label}</Text>
+                    </Pressable>
+                    ))}
+                </View>
+                </View>
+            </View>
+            </View>
+
+            <Footer />
+        </ScrollView>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
-        flex: 1,
-        backgroundColor:
-            Colors.background,
-    },
-
-    scroll: {
-        flex: 1,
-    },
-
-    scrollContent: {
-        flexGrow: 1,
-    },
+    wrapper: { flex: 1, backgroundColor: Colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { flexGrow: 1 },
 
     content: {
         flex: 1,
@@ -480,197 +171,109 @@ const styles = StyleSheet.create({
     line: {
         width: 360,
         height: 5,
-        backgroundColor:
-            Colors.text,
+        backgroundColor: Colors.text,
         alignSelf: 'center',
         marginVertical: 14,
         borderRadius: 20,
     },
 
+    /* CARD */
     card: {
         width: '100%',
         maxWidth: 1000,
-
-        backgroundColor:
-            Colors.white,
-
+        backgroundColor: Colors.white,
         borderRadius: 40,
-
-        paddingVertical: 30,
-        paddingHorizontal: 30,
-
+        padding: 30,
         borderWidth: 2,
-        borderColor:
-            Colors.inputBorder,
-
-        shadowColor:
-            Colors.black,
-
-        shadowOpacity: 0.15,
-
-        shadowRadius: 20,
-
-        shadowOffset: {
-            width: 0,
-            height: 10,
-        },
-
-        elevation: 15,
-
+        borderColor: Colors.inputBorder,
         gap: 40,
-
-        position: 'relative',
         overflow: 'hidden',
     },
 
+    /* LEFT */
     leftSection: {
-        width: isWeb
-            ? 280
-            : '100%',
-
+        width: isWeb ? 280 : '100%',
         alignItems: 'center',
         justifyContent: 'center',
-
         position: 'relative',
+    },
+
+    leftMobile: {
+        width: '100%',
+        marginTop: 15,
     },
 
     profileContent: {
         alignItems: 'center',
-        justifyContent:
-            'center',
-
-        width: '100%',
-
-        position: 'relative',
+        justifyContent: 'center',
     },
 
     glow: {
         position: 'absolute',
-
         width: 240,
         height: 240,
-
         borderRadius: 999,
-
-        backgroundColor:
-            Colors.secondary,
-
+        backgroundColor: Colors.secondary,
         opacity: 0.18,
-
         top: -20,
-
-        zIndex: 0,
     },
 
     avatarWrapper: {
         width: 200,
         height: 200,
-
-        position: 'relative',
-
-        justifyContent:
-            'center',
-
-        alignItems: 'center',
-
         borderRadius: 999,
-
-        backgroundColor:
-            Colors.white,
-
+        backgroundColor: Colors.white,
         borderWidth: 4,
-
-        borderColor:
-            Colors.details,
-
-        overflow: 'visible',
-
-        zIndex: 2,
-
-        shadowColor:
-            Colors.details,
-
-        shadowOpacity: 0.35,
-
-        shadowRadius: 15,
-
-        shadowOffset: {
-            width: 0,
-            height: 6,
-        },
-
-        elevation: 12,
+        borderColor: Colors.details,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
-    avatar: {
-        width: 160,
-        height: 160,
-    },
+    avatar: { width: 160, height: 160 },
 
     name: {
-        fontSize: isWeb
-            ? 34
-            : 28,
-
+        fontSize: isWeb ? 34 : 28,
         fontWeight: '900',
-
         color: Colors.title,
-
         marginTop: 22,
-
         textAlign: 'center',
     },
 
     role: {
         fontSize: 14,
-
         color: Colors.subtitle,
-
         fontWeight: '700',
-
         marginTop: 8,
-
-        letterSpacing: 1,
-
-        textTransform:
-            'uppercase',
-
+        textTransform: 'uppercase',
         textAlign: 'center',
     },
 
     badge: {
         marginTop: 18,
-
-        backgroundColor:
-            Colors.details,
-
+        backgroundColor: Colors.details,
         paddingHorizontal: 20,
-
         paddingVertical: 10,
-
         borderRadius: 999,
     },
 
     badgeText: {
         color: Colors.gray[800],
-
         fontWeight: '800',
-
         fontSize: 14,
     },
 
-    rightSection: {
-        flex: 1,
-        justifyContent: 'center',
+    /* RIGHT */
+    rightSection: { flex: 1 },
+
+    rightMobile: {
+        borderLeftWidth: 0,
+        paddingLeft: 0,
+        paddingTop: 10,
     },
 
     statHeader: {
         flexDirection: 'row',
-
-        justifyContent:
-            'space-between',
-
-        alignItems: 'center',
+        justifyContent: 'space-between',
     },
 
     statTitle: {
@@ -686,26 +289,16 @@ const styles = StyleSheet.create({
     },
 
     xpBarTrack: {
-        width: '100%',
         height: 16,
-
-        backgroundColor:
-            Colors.inputBorder,
-
+        backgroundColor: Colors.inputBorder,
         borderRadius: 999,
-
         overflow: 'hidden',
-
         marginTop: 14,
     },
 
     xpBarFill: {
         height: '100%',
-
-        backgroundColor:
-            Colors.details,
-
-        borderRadius: 999,
+        backgroundColor: Colors.details,
     },
 
     xpText: {
@@ -716,100 +309,59 @@ const styles = StyleSheet.create({
     },
 
     statDivider: {
-        width: '100%',
         height: 2,
-
-        backgroundColor:
-            Colors.inputBorder,
-
+        backgroundColor: Colors.inputBorder,
         marginVertical: 20,
     },
 
+    /* GRID */
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent:
-            'space-between',
+        justifyContent: 'space-between',
         gap: 18,
     },
 
-    gridCard: {
-        width: isWeb
-            ? '47%'
-            : '100%',
-
-        backgroundColor:
-            Colors.white,
-
-        borderRadius: 24,
-
-        paddingVertical: 28,
-        paddingHorizontal: 16,
-
+    gridMobile: {
+        flexDirection: 'column',
         alignItems: 'center',
+    },
 
+    gridCard: {
+        width: isWeb ? '47%' : '100%',
+        backgroundColor: Colors.white,
+        borderRadius: 24,
+        paddingVertical: 28,
+        alignItems: 'center',
         borderWidth: 1,
-
-        borderColor:
-            Colors.inputBorder,
-
-        shadowColor:
-            Colors.black,
-
-        shadowOpacity: 0.05,
-
-        shadowRadius: 10,
-
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-
-        elevation: 4,
-
-        transitionDuration:
-            '200ms' as any,
+        borderColor: Colors.inputBorder,
     },
 
-gridCardHover: {
-    borderColor: '#FFD54A',
-
-    shadowColor: '#FFD54A',
-
-    shadowOpacity: 0.25,
-
-    shadowRadius: 12,
-
-    shadowOffset: {
-        width: 0,
-        height: 0,
+    gridCardMobile: {
+        width: '100%',
     },
 
-    elevation: 10,
+    gridCardHover: {
+        borderColor: '#FFD54A',
+        shadowColor: '#FFD54A',
+        shadowOpacity: 0.25,
+    },
 
-    ...(Platform.OS === 'web'
-        ? {
-              boxShadow:
-                  '0px 0px 18px rgba(255, 213, 74, 0.45)',
-          }
-        : {}),
-},
-
-    gridEmoji: {
-        fontSize: 32,
-        marginBottom: 12,
+    gridEmoji: { 
+        fontSize: 32, 
+        marginBottom: 12 
     },
 
     gridNumber: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: Colors.title,
+        fontSize: 28, 
+        fontWeight: '900', 
+        color: Colors.title 
     },
 
     gridLabel: {
-        marginTop: 8,
-        fontSize: 14,
-        color: Colors.subtitle,
-        fontWeight: '700',
+        marginTop: 8, 
+        fontSize: 14, 
+        color: Colors.subtitle, 
+        fontWeight: '700' 
     },
 });

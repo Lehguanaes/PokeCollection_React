@@ -1,11 +1,5 @@
 import React from 'react';
-
-import {
-  FlatList,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-
+import { FlatList, useWindowDimensions, View } from 'react-native';
 import { styles } from './styles';
 
 type ListProps = {
@@ -16,12 +10,11 @@ type ListProps = {
   ) => React.ReactNode;
 
   onLoadMore?: () => void;
-
   columns?: number;
-
   horizontal?: boolean;
-
   cardPerView?: number;
+  scrollEnabled?: boolean;
+  contentContainerStyle?: any;
 };
 
 export function List({
@@ -31,11 +24,13 @@ export function List({
   columns,
   horizontal = false,
   cardPerView,
+  scrollEnabled = true,
+  contentContainerStyle,
 }: ListProps) {
   const { width } =
     useWindowDimensions();
 
-  // GRID MODE (POKEDEX)
+  // GRID RESPONSIVO
   const numColumns =
     columns
       ? columns
@@ -45,7 +40,7 @@ export function List({
       ? 2
       : 1;
 
-  // CARD WIDTH (HORIZONTAL MODE - TEAM)
+  // WIDTH DOS CARDS HORIZONTAIS
   const itemWidth = cardPerView
     ? width / cardPerView - 20
     : undefined;
@@ -54,28 +49,37 @@ export function List({
     <FlatList
       data={data}
       horizontal={horizontal}
+      nestedScrollEnabled
+      scrollEnabled={scrollEnabled}
       numColumns={
         horizontal ? 1 : numColumns
       }
       key={
         horizontal
-          ? 'h'
-          : numColumns
+          ? 'horizontal'
+          : `grid-${numColumns}`
       }
-      keyExtractor={(item) =>
+      keyExtractor={(
+        item,
+        index
+      ) =>
         String(
-          item.id ??
-            item.index ??
-            item.nome
+          item?.id ??
+            item?.index ??
+            item?.nome ??
+            index
         )
       }
       renderItem={({ item }) => (
         <View
           style={[
             styles.itemContainer,
-            horizontal && itemWidth
+
+            horizontal &&
+            itemWidth
               ? {
-                  width: itemWidth,
+                  width:
+                    itemWidth,
                 }
               : null,
           ]}
@@ -91,9 +95,10 @@ export function List({
           ? styles.row
           : undefined
       }
-      contentContainerStyle={
-        styles.container
-      }
+      contentContainerStyle={[
+        styles.container,
+        contentContainerStyle,
+      ]}
       showsHorizontalScrollIndicator={
         false
       }
@@ -102,6 +107,12 @@ export function List({
       }
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.5}
+      removeClippedSubviews={
+        false
+      }
+      initialNumToRender={8}
+      maxToRenderPerBatch={8}
+      windowSize={10}
     />
   );
 }

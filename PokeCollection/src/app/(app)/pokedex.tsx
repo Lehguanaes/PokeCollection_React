@@ -1,16 +1,32 @@
-import React, { useEffect, useState, useCallback, } from 'react';
-import { View, Text, StyleSheet, } from 'react-native';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
+
 import { useAuth } from '@/context/AuthContext';
-import { List } from '@/components/list';
+
+import { PokeballLoading } from '@/components/pokeballLoading';
+import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { PokeballLoading } from '@/components/pokeballLoading';
-import { Colors } from '@/constants/colors';
-import { getPokemons } from '@/integration/pokemonIntegration';
-import { Pokemon } from '@/@types/pokemon';
-import { TYPE_MAP } from '@/constants/pokemon';
 import { Card } from '@/components/card';
-import { BackgroundPokemons } from '@/components/backgroundPokemons';
+import { List } from '@/components/list';
+
+import { Colors } from '@/constants/colors';
+
+import { getPokemons } from '@/integration/pokemonIntegration';
+
+import { Pokemon } from '@/@types/pokemon';
+
+import { TYPE_MAP } from '@/constants/pokemon';
 
 const mapType = (t: string) =>
   TYPE_MAP[t] ?? 'normal';
@@ -18,7 +34,7 @@ const mapType = (t: string) =>
 const POKEMON_LIMIT = 151;
 
 export default function Pokedex() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   const [loading, setLoading] =
     useState(true);
@@ -48,159 +64,125 @@ export default function Pokedex() {
     loadData();
   }, []);
 
-  const handleLoadMore =
-    useCallback(() => {}, []);
-
   const renderPokemonCard =
     useCallback(
-      (pokemon: Pokemon) => {
-        if (!pokemon) return null;
-
+      (item: Pokemon) => {
         const tipos =
-          pokemon.tipos?.map(
+          item?.tipos?.map(
             mapType
           ) || [];
 
         return (
-        <Card
-          title={pokemon.nome}
-          image={{
-            uri: pokemon.imagem,
-          }}
-          tipos={tipos}
-          poderes={pokemon.poderes}
-          showDetailsButton
-        />
+          <Card
+            key={item.index}
+            title={item.nome}
+            image={{
+              uri: item.imagem,
+            }}
+            tipos={tipos}
+            poderes={
+              item.poderes
+            }
+            showDetailsButton
+          />
         );
       },
       []
     );
 
   if (loading) {
-    return (
-      <PokeballLoading />
-    );
+    return <PokeballLoading />;
   }
 
   return (
     <View style={styles.wrapper}>
       <BackgroundPokemons />
 
-      <Header />
-
-      <Text
-        style={
-          styles.title
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={
+          styles.scrollContent
         }
       >
-        Bem-vindo a Pokédex, {user}!
-      </Text>
+        <Header />
 
-      <View
-          style={styles.line}
-      />
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            Bem-vindo a Pokédex,{' '}
+            {user}!
+          </Text>
 
-      <Text
-        style={
-          styles.subtitle
-        }
-      >
-        Explore os 151 primeiros pokémons! ✨
-      </Text>
+          <View style={styles.line} />
 
-      <View style={styles.listContainer}>
+          <Text
+            style={styles.subtitle}
+          >
+            Explore os 151 primeiros
+            pokémons! ✨
+          </Text>
+        </View>
+
         <List
           data={pokemons}
-          onLoadMore={
-            handleLoadMore
-          }
+          columns={3}
           renderItemContent={
             renderPokemonCard
           }
+          scrollEnabled={false}
         />
-      </View>
-      <Footer />
+
+        <Footer />
+      </ScrollView>
     </View>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    wrapper: {
-      flex: 1,
-      backgroundColor:
-        Colors.background,
-    },
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor:
+      Colors.background,
+  },
 
-    listContainer: {
-      flex: 1,
-    },
+  scrollContent: {
+    paddingBottom: 0,
+  },
 
-        container: {
-        backgroundColor: Colors.background,
-        paddingBottom: 0,
-    },
+  header: {
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    paddingHorizontal: 20,
+  },
 
-    content: {
-        paddingHorizontal: 20,
-        gap: 16,
-    },
+  listContent: {
+    paddingBottom: 20,
+  },
 
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: Colors.title,
-        textAlign: 'center',
-        marginTop: 10,
-    },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.title,
+    textAlign: 'center',
+  },
 
-    subtitle: {
-        fontSize: 18,
-        color: Colors.subtitle,
-        textAlign: 'center',
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
+  subtitle: {
+    fontSize: 18,
+    color: Colors.subtitle,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
 
-    line: {
-      width: 355,
-      height: 5,
-      backgroundColor:
-        Colors.text,
-      alignSelf: "center",
-      marginVertical: 12,
-      borderRadius: 3,
-    },
-
-    logoutButton: {
-        backgroundColor: Colors.primary,
-        paddingVertical: 12,
-        width: 180,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-
-    logoutText: {
-        color: Colors.white,
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-
-    buttonContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 20,
-        marginBottom: 30,
-        width: '100%',
-    },
-
-    buttonHover: {
-        backgroundColor: Colors.pokeballRed,
-        transform: [{ scale: 1.05 }],
-    },
-
-    buttonPressed: {
-        opacity: 0.7,
-        transform: [{ scale: 0.97 }],
-    },
-  });
+  line: {
+    width: 355,
+    height: 5,
+    backgroundColor:
+      Colors.text,
+    alignSelf: 'center',
+    marginVertical: 12,
+    borderRadius: 3,
+  },
+});

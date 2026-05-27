@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-import {
-    View,
-    Text,
-    ScrollView,
-    StyleSheet,
-} from 'react-native';
-
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Header } from '@/components/header';
 import { PokeballLoading } from '@/components/pokeballLoading';
 import { List } from '@/components/list';
@@ -14,17 +7,9 @@ import { Card } from '@/components/card';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { getPokemons } from '@/integration/pokemonIntegration';
 import { Footer } from '@/components/footer';
-import {
-    Pokemon,
-} from '@/@types/pokemon';
-
-import {
-    Colors,
-} from '@/constants/colors';
-
-import {
-    TYPE_MAP,
-} from '@/constants/pokemon';
+import { Pokemon } from '@/@types/pokemon';
+import { Colors } from '@/constants/colors';
+import { TYPE_MAP } from '@/constants/pokemon';
 
 const mapType = (t: string) =>
     TYPE_MAP[t] ?? 'normal';
@@ -44,6 +29,12 @@ export default function Dashboard() {
         randomPokemons,
         setRandomPokemons,
     ] = useState<Pokemon[]>([]);
+
+    const { width } =
+        useWindowDimensions();
+
+    const isMobile =
+        width < 768;
 
     useEffect(() => {
         async function load() {
@@ -90,12 +81,12 @@ export default function Dashboard() {
 
         return (
             <View
+                key={pokemon.index}
                 style={
                     styles.teamCardWrapper
                 }
             >
                 <Card
-                    key={pokemon.index}
                     title={pokemon.nome}
                     image={{
                         uri: pokemon.imagem,
@@ -141,7 +132,6 @@ export default function Dashboard() {
     return (
         <View style={styles.wrapper}>
             <BackgroundPokemons />
-            <Header />
 
             <ScrollView
                 style={styles.scroll}
@@ -152,7 +142,7 @@ export default function Dashboard() {
                     false
                 }
             >
-                {/* MEU TIME */}
+            <Header />
                 <View
                     style={
                         styles.sectionHeader
@@ -186,11 +176,17 @@ export default function Dashboard() {
                     )}
                 </View>
 
+                {/* TIME */}
                 {!loading && (
                     <View
-                        style={
-                            styles.teamContainer
-                        }
+                        style={[
+                            styles.teamContainer,
+
+                            isMobile && {
+                                flexDirection:
+                                    'column',
+                            },
+                        ]}
                     >
                         {myTeam.map(
                             (
@@ -203,14 +199,13 @@ export default function Dashboard() {
                     </View>
                 )}
 
-                {/* POKEMONS */}
+                {/* POKEDEX */}
                 <View
                     style={[
                         styles.sectionHeader,
                         styles.sectionHeaderList,
                     ]}
                 >
-
                     <Text
                         style={
                             styles.sectionTitle
@@ -218,6 +213,7 @@ export default function Dashboard() {
                     >
                         Meus Pokémons
                     </Text>
+
                     <View
                         style={
                             styles.sectionAccent
@@ -242,20 +238,25 @@ export default function Dashboard() {
                         data={
                             randomPokemons
                         }
-                        columns={3}
+                        columns={
+                            isMobile
+                                ? 1
+                                : 3
+                        }
+                        scrollEnabled={
+                            false
+                        }
                         renderItemContent={
                             renderGridCard
+                        }
+                        contentContainerStyle={
+                            styles.listContent
                         }
                     />
                 )}
 
-                <View
-                    style={
-                        styles.bottomSpacer
-                    }
-                />
+                <Footer />
             </ScrollView>
-        <Footer />
         </View>
     );
 }
@@ -272,7 +273,8 @@ const styles = StyleSheet.create({
     },
 
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 0,
+        flexGrow: 1,
     },
 
     sectionHeader: {
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
         backgroundColor:
             Colors.black,
         marginBottom: 12,
-        marginTop: 10, 
+        marginTop: 10,
     },
 
     sectionTitle: {
@@ -305,13 +307,13 @@ const styles = StyleSheet.create({
 
     sectionSub: {
         marginTop: 6,
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: '600',
         color: Colors.subtitle,
         textAlign: 'center',
     },
 
-    /* ================= TIME ================= */
+    /* TIME */
 
     teamContainer: {
         width: '100%',
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
         justifyContent:
             'center',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
         paddingHorizontal: 20,
         marginTop: 10,
     },
@@ -333,9 +335,9 @@ const styles = StyleSheet.create({
         ],
     },
 
-    /* ================= GERAL ================= */
+    /* LIST */
 
-    bottomSpacer: {
-        height: 30,
+    listContent: {
+        paddingBottom: 10,
     },
 });

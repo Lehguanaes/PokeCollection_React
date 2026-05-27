@@ -59,7 +59,7 @@ export default function App() {
         signIn(name);
 
         router.push({
-          pathname: "/profile",
+          pathname: "/pokedex",
           params: {
             username: name,
           },

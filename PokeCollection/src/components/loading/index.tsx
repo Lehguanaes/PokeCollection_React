@@ -29,7 +29,7 @@ function PulseBall({ delay }: { delay: number }) {
   );
 }
 
-export function PokeballLoading() {
+export function Loading() {
   return (
     <View style={styles.container}>
       <View style={styles.row}>

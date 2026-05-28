@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform, Image, ScrollView, useWindowDimensions, Pressable } from 'react-native';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { PokeballLoading } from '@/components/pokeballLoading';
+import {Menu} from '@/components/menu';
+import { Loading } from '@/components/loading';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -23,12 +24,12 @@ export default function Perfil() {
         return () => clearTimeout(timer);
     }, []);
 
-    if (loading) return <PokeballLoading />;
+    if (loading) return <Loading />;
 
     return (
         <View style={styles.wrapper}>
         <BackgroundPokemons />
-
+        <Menu />    
         <ScrollView
             style={styles.scroll}
             contentContainerStyle={styles.scrollContent}

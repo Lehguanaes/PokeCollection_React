@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Header } from '@/components/header';
-import { PokeballLoading } from '@/components/pokeballLoading';
+import { Loading } from '@/components/loading';
 import { List } from '@/components/list';
 import { Card } from '@/components/card';
+import {Menu} from '@/components/menu';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { getPokemons } from '@/integration/pokemonIntegration';
 import { Footer } from '@/components/footer';
@@ -132,7 +133,7 @@ export default function Dashboard() {
     return (
         <View style={styles.wrapper}>
             <BackgroundPokemons />
-
+            <Menu />    
             <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={
@@ -232,7 +233,7 @@ export default function Dashboard() {
                 </View>
 
                 {loading ? (
-                    <PokeballLoading />
+                    <Loading />
                 ) : (
                     <List
                         data={

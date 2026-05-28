@@ -1,31 +1,16 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-} from 'react';
-
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
-
-import { PokeballLoading } from '@/components/pokeballLoading';
+import { Loading } from '@/components/loading';
 import { BackgroundPokemons } from '@/components/backgroundPokemons';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import {Menu} from '@/components/menu';
 import { Card } from '@/components/card';
 import { List } from '@/components/list';
-
 import { Colors } from '@/constants/colors';
-
 import { getPokemons } from '@/integration/pokemonIntegration';
-
 import { Pokemon } from '@/@types/pokemon';
-
 import { TYPE_MAP } from '@/constants/pokemon';
 
 const mapType = (t: string) =>
@@ -91,13 +76,13 @@ export default function Pokedex() {
     );
 
   if (loading) {
-    return <PokeballLoading />;
+    return <Loading />;
   }
 
   return (
     <View style={styles.wrapper}>
       <BackgroundPokemons />
-
+      <Menu />    
       <ScrollView
         showsVerticalScrollIndicator={
           false

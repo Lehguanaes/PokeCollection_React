@@ -1,14 +1,15 @@
 import React from 'react';
-import { FlatList, useWindowDimensions, View } from 'react-native';
+import {
+  FlatList,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+
 import { styles } from './styles';
 
 type ListProps = {
   data: any[];
-
-  renderItemContent?: (
-    item: any
-  ) => React.ReactNode;
-
+  renderItemContent?: (item: any) => React.ReactNode;
   onLoadMore?: () => void;
   columns?: number;
   horizontal?: boolean;
@@ -27,20 +28,19 @@ export function List({
   scrollEnabled = true,
   contentContainerStyle,
 }: ListProps) {
-  const { width } =
-    useWindowDimensions();
+  const { width } = useWindowDimensions();
 
-  // GRID RESPONSIVO
-  const numColumns =
-    columns
-      ? columns
-      : width > 1100
-      ? 3
-      : width > 700
-      ? 2
-      : 1;
+  // Responsivo: ignora `columns` fixo e decide pelo breakpoint
+  const numColumns = horizontal
+    ? 1
+    : columns !== undefined
+    ? columns
+    : width >= 1100
+    ? 3
+    : width >= 560
+    ? 2
+    : 1;
 
-  // WIDTH DOS CARDS HORIZONTAIS
   const itemWidth = cardPerView
     ? width / cardPerView - 20
     : undefined;
@@ -51,65 +51,33 @@ export function List({
       horizontal={horizontal}
       nestedScrollEnabled
       scrollEnabled={scrollEnabled}
-      numColumns={
-        horizontal ? 1 : numColumns
-      }
-      key={
-        horizontal
-          ? 'horizontal'
-          : `grid-${numColumns}`
-      }
-      keyExtractor={(
-        item,
-        index
-      ) =>
-        String(
-          item?.id ??
-            item?.index ??
-            item?.nome ??
-            index
-        )
+      numColumns={numColumns}
+      key={horizontal ? 'horizontal' : `grid-${numColumns}`}
+      keyExtractor={(item, index) =>
+        String(item?.id ?? item?.index ?? item?.nome ?? index)
       }
       renderItem={({ item }) => (
         <View
           style={[
             styles.itemContainer,
-
-            horizontal &&
-            itemWidth
-              ? {
-                  width:
-                    itemWidth,
-                }
-              : null,
+            horizontal && itemWidth ? { width: itemWidth } : null,
           ]}
         >
-          {renderItemContent?.(
-            item
-          )}
+          {renderItemContent?.(item)}
         </View>
       )}
       columnWrapperStyle={
-        !horizontal &&
-        numColumns > 1
-          ? styles.row
-          : undefined
+        !horizontal && numColumns > 1 ? styles.row : undefined
       }
       contentContainerStyle={[
         styles.container,
         contentContainerStyle,
       ]}
-      showsHorizontalScrollIndicator={
-        false
-      }
-      showsVerticalScrollIndicator={
-        false
-      }
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.5}
-      removeClippedSubviews={
-        false
-      }
+      removeClippedSubviews={false}
       initialNumToRender={8}
       maxToRenderPerBatch={8}
       windowSize={10}

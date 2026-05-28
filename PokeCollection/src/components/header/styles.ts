@@ -6,6 +6,8 @@ export const styles = StyleSheet.create({
     height: 72,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'visible',
+    zIndex: 999,
   },
   topHalf: {
     position: 'absolute',

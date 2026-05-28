@@ -7,7 +7,7 @@ import { Alert } from "@/components/alert";
 import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 import { Loading } from "@/components/loading";
-import { BackgroundPokemons } from '@/components/backgroundPokemons';
+import { Background} from '@/components/background';
 import { useAuth } from "@/context/AuthContext";
 import { Colors } from "@/constants/colors";
 
@@ -59,7 +59,7 @@ export default function App() {
         signIn(name);
 
         router.push({
-          pathname: "/pokedex",
+          pathname: "/team",
           params: {
             username: name,
           },
@@ -179,7 +179,7 @@ export default function App() {
         false
       }
     >
-      <BackgroundPokemons />
+      <Background />
       <Header />
 
       <View style={styles.content}>

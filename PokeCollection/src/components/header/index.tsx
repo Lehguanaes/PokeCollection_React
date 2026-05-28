@@ -1,13 +1,22 @@
-import { View } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { styles } from "./styles";
+import { Menu } from "@/components/menu";
 
-// Define o componente do cabeçalho da Pokebola
 export function Header() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   return (
     <View style={styles.container}>
       <View style={styles.topHalf} />
       <View style={styles.middleLine} />
-      <View style={styles.circle} />
+
+      {isMobile ? (
+        // No mobile, a pokébola do Menu substitui o círculo estático
+        <Menu />
+      ) : (
+        <View style={styles.circle} />
+      )}
     </View>
   );
 }

@@ -38,7 +38,7 @@ const STYLE_KEYS = [
     "p4",
 ] as const;
 
-export function BackgroundPokemons({
+export function Background({
     items,
 }: Props) {
     const { width } =

@@ -4,7 +4,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import {Menu} from '@/components/menu';
 import { Loading } from '@/components/loading';
-import { BackgroundPokemons } from '@/components/backgroundPokemons';
+import { Background } from '@/components/background';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 
@@ -28,8 +28,8 @@ export default function Perfil() {
 
     return (
         <View style={styles.wrapper}>
-        <BackgroundPokemons />
-        <Menu />    
+        <Background />
+        {!isMobile && <Menu />} 
         <ScrollView
             style={styles.scroll}
             contentContainerStyle={styles.scrollContent}

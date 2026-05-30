@@ -23,7 +23,7 @@ const mapType = (t: string) => TYPE_MAP[t] ?? 'normal';
 const MY_TEAM_SIZE = 5;
 const POKEDEX_SIZE = 25;
 
-export default function Dashboard() {
+export default function Team() {
   const [loading, setLoading] = useState(true);
   const [myTeam, setMyTeam] = useState<Pokemon[]>([]);
   const [randomPokemons, setRandomPokemons] = useState<Pokemon[]>([]);
@@ -33,7 +33,6 @@ export default function Dashboard() {
   const isMobile = width < 560;
   const pokedexColumns = width >= 1100 ? 3 : width >= 560 ? 2 : 1;
 
-  // ✅ useMemo ANTES do early return
   const teamRows: Pokemon[][] = React.useMemo(() => {
     if (width >= 1100) {
       return [myTeam.slice(0, 2), myTeam.slice(2, 5)];
@@ -64,7 +63,6 @@ export default function Dashboard() {
     load();
   }, []);
 
-  // ✅ Early return DEPOIS de todos os hooks
   if (loading) {
     return <Loading />;
   }
@@ -111,11 +109,14 @@ export default function Dashboard() {
       >
         <Header />
 
-        {/* SEÇÃO: MEU TIME */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Meu Time Escolhido</Text>
-          <View style={styles.sectionAccent} />
-          <Text style={styles.sectionSub}>{myTeam.length} selecionados</Text>
+          <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
+            Meu Time Escolhido
+          </Text>
+          <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
+          <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
+            {myTeam.length} selecionados
+          </Text>
         </View>
 
         <View style={styles.teamContainer}>
@@ -126,11 +127,14 @@ export default function Dashboard() {
           ))}
         </View>
 
-        {/* SEÇÃO: POKÉDEX */}
         <View style={[styles.sectionHeader, styles.sectionHeaderList]}>
-          <Text style={styles.sectionTitle}>Meus Pokémons</Text>
-          <View style={styles.sectionAccent} />
-          <Text style={styles.sectionSub}>25 aleatórios</Text>
+          <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
+            Meus Pokémons
+          </Text>
+          <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
+          <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
+            25 aleatórios
+          </Text>
         </View>
 
         <List
@@ -152,27 +156,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-
   scroll: {
     flex: 1,
   },
-
   scrollContent: {
     paddingBottom: 0,
     flexGrow: 1,
   },
-
   sectionHeader: {
     paddingHorizontal: 20,
     marginTop: 26,
     marginBottom: 18,
     alignItems: 'center',
   },
-
   sectionHeaderList: {
     marginTop: 36,
   },
-
   sectionAccent: {
     width: 140,
     height: 5,
@@ -181,14 +180,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: 10,
   },
-
+  sectionAccentMobile: {
+    width: 100,
+  },
   sectionTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: Colors.title,
     textAlign: 'center',
   },
-
+  sectionTitleMobile: {
+    fontSize: 20,
+  },
   sectionSub: {
     marginTop: 6,
     fontSize: 18,
@@ -196,7 +199,9 @@ const styles = StyleSheet.create({
     color: Colors.subtitle,
     textAlign: 'center',
   },
-
+  sectionSubMobile: {
+    fontSize: 14,
+  },
   teamContainer: {
     width: '100%',
     alignItems: 'center',
@@ -204,17 +209,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 10,
   },
-
   teamRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
   },
-
   teamCardWrapper: {
     transform: [{ scale: 0.92 }],
   },
-
   listContent: {
     paddingBottom: 10,
   },

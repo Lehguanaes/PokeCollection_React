@@ -8,12 +8,12 @@ type HeaderProps = {
 
 export function Header({ showMenu = true }: HeaderProps) {
   const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const isMobile = width < 560;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topHalf} />
-      <View style={styles.middleLine} />
+    <View style={[styles.container, isMobile && styles.containerMobile]}>
+      <View style={[styles.topHalf, isMobile && styles.topHalfMobile]} />
+      <View style={[styles.middleLine, isMobile && styles.middleLineMobile]} />
 
       {isMobile && showMenu ? (
         <Menu />

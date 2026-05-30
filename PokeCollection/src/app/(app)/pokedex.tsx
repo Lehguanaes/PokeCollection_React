@@ -25,7 +25,7 @@ const POKEMON_LIMIT = 151;
 export default function Pokedex() {
   const { user } = useAuth();
   const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const isMobile = width < 560;
 
   const [loading, setLoading] = useState(true);
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -77,11 +77,11 @@ export default function Pokedex() {
         <Header />
 
         <View style={styles.header}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, isMobile && styles.titleMobile]}>
             Bem-vindo a Pokédex, {user}!
           </Text>
-          <View style={styles.line} />
-          <Text style={styles.subtitle}>
+          <View style={[styles.line, isMobile && styles.lineMobile]} />
+          <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
             Explore os 151 primeiros pokémons! ✨
           </Text>
         </View>
@@ -119,12 +119,18 @@ const styles = StyleSheet.create({
     color: Colors.title,
     textAlign: 'center',
   },
+  titleMobile: {
+    fontSize: 20,
+  },
   subtitle: {
     fontSize: 18,
     color: Colors.subtitle,
     textAlign: 'center',
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  subtitleMobile: {
+    fontSize: 14,
   },
   line: {
     width: 355,
@@ -133,5 +139,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 12,
     borderRadius: 3,
+  },
+  lineMobile: {
+    width: 200,
   },
 });

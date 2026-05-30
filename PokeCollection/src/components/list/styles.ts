@@ -8,8 +8,9 @@ export const styles = StyleSheet.create({
   },
 
   row: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    flexWrap: 'wrap',
+    width: '100%',
     gap: 16,
     marginBottom: 16,
   },
@@ -17,5 +18,6 @@ export const styles = StyleSheet.create({
   itemContainer: {
     alignItems: 'center',
     margin: 4,
+    width: 280,   // ✅ largura fixa do card — ajuste conforme o tamanho do seu Card
   },
 });

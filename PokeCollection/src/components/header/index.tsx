@@ -2,7 +2,11 @@ import { View, useWindowDimensions } from "react-native";
 import { styles } from "./styles";
 import { Menu } from "@/components/menu";
 
-export function Header() {
+type HeaderProps = {
+  showMenu?: boolean;
+};
+
+export function Header({ showMenu = true }: HeaderProps) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -11,8 +15,7 @@ export function Header() {
       <View style={styles.topHalf} />
       <View style={styles.middleLine} />
 
-      {isMobile ? (
-        // No mobile, a pokébola do Menu substitui o círculo estático
+      {isMobile && showMenu ? (
         <Menu />
       ) : (
         <View style={styles.circle} />

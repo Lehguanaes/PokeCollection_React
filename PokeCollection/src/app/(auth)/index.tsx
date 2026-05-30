@@ -180,8 +180,7 @@ export default function App() {
       }
     >
       <Background />
-      <Header />
-
+      <Header showMenu={false} />
       <View style={styles.content}>
         <Animated.View
           style={[

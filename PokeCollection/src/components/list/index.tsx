@@ -30,7 +30,6 @@ export function List({
 }: ListProps) {
   const { width } = useWindowDimensions();
 
-  // Responsivo: ignora `columns` fixo e decide pelo breakpoint
   const numColumns = horizontal
     ? 1
     : columns !== undefined
@@ -41,9 +40,31 @@ export function List({
     ? 2
     : 1;
 
-  const itemWidth = cardPerView
-    ? width / cardPerView - 20
-    : undefined;
+  const itemWidth = cardPerView ? width / cardPerView - 20 : undefined;
+
+  if (!scrollEnabled && !horizontal) {
+    const rows: any[][] = [];
+    for (let i = 0; i < data.length; i += numColumns) {
+      rows.push(data.slice(i, i + numColumns));
+    }
+
+    return (
+      <View style={[styles.container, contentContainerStyle]}>
+        {rows.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.row}>
+            {row.map((item, colIndex) => (
+              <View
+                key={item?.id ?? item?.index ?? item?.nome ?? colIndex}
+                style={styles.itemContainer}
+              >
+                {renderItemContent?.(item)}
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -69,10 +90,7 @@ export function List({
       columnWrapperStyle={
         !horizontal && numColumns > 1 ? styles.row : undefined
       }
-      contentContainerStyle={[
-        styles.container,
-        contentContainerStyle,
-      ]}
+      contentContainerStyle={[styles.container, contentContainerStyle]}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}

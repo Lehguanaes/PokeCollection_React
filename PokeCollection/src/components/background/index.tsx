@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, Platform, useWindowDimensions, Animated } from "react-native";
+import { Image, Platform, useWindowDimensions, Animated } from "react-native";
 import { styles } from "./styles";
 
 type PokemonBackgroundItem = {

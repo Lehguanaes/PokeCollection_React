@@ -21,6 +21,7 @@ import {
   User,
   Trophy,
   Cat,
+  LogOut,
 } from 'lucide-react-native';
 
 import { Colors } from '@/constants/colors';
@@ -41,6 +42,11 @@ const MENU_ITEMS = [
     label: 'Pokédex',
     icon: Cat,
     route: '/pokedex',
+  },
+  {
+    label: 'Desconectar',
+    icon: LogOut,
+    route: '/',
   },
 ];
 

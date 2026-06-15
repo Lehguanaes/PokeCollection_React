@@ -9,14 +9,14 @@ export const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     transitionDuration: '200ms',
-  },
+  } as any,
 
   text: {
     color: Colors.white,
     fontWeight: 'bold',
     fontSize: 16,
     transitionDuration: '200ms',
-  },
+  } as any,
 
   hover: {
     backgroundColor: Colors.details,

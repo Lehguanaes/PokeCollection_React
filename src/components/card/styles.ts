@@ -12,6 +12,9 @@ export const styles =
       backgroundColor:
         Colors.white,
       borderRadius: 28,
+      borderWidth: 2,
+      borderColor:
+        'rgba(255,255,255,0)',
       padding: 18,
       alignItems: 'center',
       gap: 14,
@@ -22,7 +25,7 @@ export const styles =
       'web'
         ? {
             transition:
-              'all 0.25s ease',
+              'all 0.28s cubic-bezier(0.2, 0.9, 0.2, 1)',
             cursor: 'pointer',
             boxShadow:
               '0px 12px 28px rgba(0,0,0,0.10)',
@@ -46,6 +49,9 @@ export const styles =
       backgroundColor:
         Colors.white,
       borderRadius: 28,
+      borderWidth: 2,
+      borderColor:
+        'rgba(255,255,255,0)',
       padding: 18,
       marginRight: 18,
       alignItems: 'center',
@@ -55,7 +61,7 @@ export const styles =
       'web'
         ? {
             transition:
-              'all 0.25s ease',
+              'all 0.28s cubic-bezier(0.2, 0.9, 0.2, 1)',
             cursor: 'pointer',
             boxShadow:
               '0px 12px 28px rgba(0,0,0,0.10)',

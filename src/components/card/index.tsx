@@ -75,6 +75,8 @@ export function Card({
 }: CardProps) {
   const [visible, setVisible] =
     useState(false);
+  const [hovered, setHovered] =
+    useState(false);
 
   const floatAnim = useRef(
     new Animated.Value(0)
@@ -147,11 +149,13 @@ export function Card({
   }, []);
 
   const handleHoverIn = () => {
+    setHovered(true);
+
     Animated.parallel([
       Animated.spring(
         hoverScale,
         {
-          toValue: 1.04,
+          toValue: 1.055,
           useNativeDriver: true,
         }
       ),
@@ -159,7 +163,7 @@ export function Card({
       Animated.spring(
         hoverY,
         {
-          toValue: -8,
+          toValue: -10,
           useNativeDriver: true,
         }
       ),
@@ -167,6 +171,8 @@ export function Card({
   };
 
   const handleHoverOut = () => {
+    setHovered(false);
+
     Animated.parallel([
       Animated.spring(
         hoverScale,
@@ -185,6 +191,29 @@ export function Card({
       ),
     ]).start();
   };
+
+  const accentColor =
+    TYPE_COLORS[tipos[0]] ??
+    colors.accent ??
+    Colors.details;
+
+  const hoverCardStyle =
+    Platform.OS === 'web' &&
+    hovered
+      ? ({
+          borderColor:
+            accentColor,
+          boxShadow: `0 0 0 3px ${accentColor}44, 0 0 26px ${accentColor}88, 0 18px 34px rgba(0,0,0,0.16), inset 0 0 18px ${accentColor}18`,
+        } as any)
+      : {};
+
+  const hoverImageStyle =
+    Platform.OS === 'web' &&
+    hovered
+      ? ({
+          boxShadow: `0 0 0 5px ${accentColor}22, 0 0 34px ${accentColor}AA`,
+        } as any)
+      : {};
 
   return (
     <Pressable
@@ -218,11 +247,17 @@ export function Card({
             ],
 
             shadowOpacity:
-              glowAnim,
+              hovered ? 0.42 : glowAnim,
 
             borderColor:
-              colors.accent,
+              hovered
+                ? accentColor
+                : 'rgba(255,255,255,0)',
+
+            shadowColor:
+              accentColor,
           },
+          hoverCardStyle,
         ]}
       >
         <View
@@ -282,18 +317,16 @@ export function Card({
               {
                 borderColor:
                   showDetailsButton
-                    ? TYPE_COLORS[
-                        tipos[0]
-                      ] ??
-                      Colors.details
+                    ? accentColor
                     : colors.accent,
 
                 shadowColor:
-                  colors.accent,
+                  accentColor,
 
                 shadowOpacity:
-                  glowAnim,
+                  hovered ? 0.55 : glowAnim,
               },
+              hoverImageStyle,
             ]}
           >
             <Animated.Image
@@ -331,9 +364,7 @@ export function Card({
                 (tipo) => (
                   <Pressable
                     key={tipo}
-                    style={({
-                      hovered,
-                    }) => ({
+                    style={(state: any) => ({
                       borderColor:
                         showDetailsButton
                           ? TYPE_COLORS[
@@ -344,7 +375,7 @@ export function Card({
                       backgroundColor:
                         Platform.OS ===
                           'web' &&
-                        hovered
+                        Boolean(state.hovered)
                           ? showDetailsButton
                             ? TYPE_COLORS[
                                 tipo
@@ -368,7 +399,7 @@ export function Card({
 
                       borderWidth: 1.5,
 
-                      transform: hovered
+                      transform: Boolean(state.hovered)
                         ? [
                             {
                               scale: 1.05,
@@ -377,11 +408,12 @@ export function Card({
                         : [],
                     })}
                   >
-                    {({
-                      hovered,
-                    }) => (
-                      <Text
-                        style={{
+                    {(state: any) => {
+                      const hovered = Boolean(state.hovered);
+
+                      return (
+                        <Text
+                          style={{
                           color:
                             Platform.OS ===
                               'web' &&
@@ -400,16 +432,17 @@ export function Card({
 
                           textTransform:
                             'capitalize',
-                        }}
-                      >
-                        {
-                          TYPE_ICONS[
-                            tipo
-                          ]
-                        }{' '}
-                        {tipo}
-                      </Text>
-                    )}
+                          }}
+                        >
+                          {
+                            TYPE_ICONS[
+                              tipo
+                            ]
+                          }{' '}
+                          {tipo}
+                        </Text>
+                      );
+                    }}
                   </Pressable>
                 )
               )}

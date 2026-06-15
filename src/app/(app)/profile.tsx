@@ -1,30 +1,126 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform, Image, ScrollView, useWindowDimensions, Pressable } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Menu } from '@/components/menu';
 import { Loading } from '@/components/loading';
 import { Background } from '@/components/background';
+import { Alert } from '@/components/alert';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import {
+  getProfileStats,
+  ProfileStats,
+  updateProfileStats,
+} from '@/integration/pokemonIntegration';
 
 const isWeb = Platform.OS === 'web';
 const XP_TOTAL = 100;
-const XP_ATUAL = 12;
 
 export default function Perfil() {
-  const { user } = useAuth();
+  const { user, userId } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [stats, setStats] = useState<ProfileStats | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [alertData, setAlertData] = useState({
+    title: '',
+    message: '',
+    type: 'warning' as 'success' | 'error' | 'warning' | 'info',
+  });
   const { width } = useWindowDimensions();
 
   const isMobile = width < 560;
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1800);
-    return () => clearTimeout(timer);
-  }, []);
+    async function loadStats() {
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await getProfileStats(userId);
+        setStats(response);
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadStats();
+  }, [userId]);
+
+  const xpAtual = useMemo(() => {
+    if (!stats) return 0;
+    return Math.min((stats.vitorias * 20) % XP_TOTAL, XP_TOTAL);
+  }, [stats]);
+
+  async function performUpdateStats(type: 'win' | 'loss') {
+    if (!userId || !stats || saving) return;
+
+    const nextVitorias =
+      type === 'win' ? stats.vitorias + 1 : stats.vitorias;
+    const nextDerrotas =
+      type === 'loss' ? stats.derrotas + 1 : stats.derrotas;
+    const nextLevel = Math.max(1, Math.floor(nextVitorias / 5) + 1);
+
+    setSaving(true);
+
+    try {
+      const updated = await updateProfileStats(userId, {
+        level: nextLevel,
+        vitorias: nextVitorias,
+        derrotas: nextDerrotas,
+      });
+
+      setStats(updated);
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      setAlertData({
+        title: 'Erro ao atualizar',
+        message: 'Nao foi possivel atualizar seus status agora.',
+        type: 'error',
+      });
+      setAlertVisible(true);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleUpdateStats(type: 'win' | 'loss') {
+    setAlertData({
+      title: type === 'win' ? 'Registrar vitoria' : 'Registrar derrota',
+      message:
+        type === 'win'
+          ? 'Deseja mesmo registrar uma nova vitoria no seu perfil?'
+          : 'Deseja mesmo registrar uma nova derrota no seu perfil?',
+      type: 'warning',
+    });
+    setConfirmAction(() => () => performUpdateStats(type));
+    setAlertVisible(true);
+  }
 
   if (loading) return <Loading />;
+
+  const displayName = stats?.username ?? user ?? 'Treinador';
+  const level = stats?.level ?? 1;
+  const vitorias = stats?.vitorias ?? 0;
+  const derrotas = stats?.derrotas ?? 0;
+  const batalhas = vitorias + derrotas;
+  const aproveitamento =
+    batalhas > 0 ? `${Math.round((vitorias / batalhas) * 100)}%` : '0%';
 
   return (
     <View style={styles.wrapper}>
@@ -38,17 +134,20 @@ export default function Perfil() {
         <Header />
 
         <Text style={[styles.title, isMobile && styles.titleMobile]}>
-          Perfil do {user}!
+          Perfil do {displayName}
         </Text>
         <View style={[styles.line, isMobile && styles.lineMobile]} />
         <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
-          Veja seus status e progresso! ✨
+          Status carregados da API do professor
         </Text>
 
         <View style={styles.content}>
-          <View style={[styles.card, { flexDirection: isMobile ? 'column' : 'row' }]}>
-
-            {/* LEFT */}
+          <View
+            style={[
+              styles.card,
+              { flexDirection: isMobile ? 'column' : 'row' },
+            ]}
+          >
             <View style={[styles.leftSection, isMobile && styles.leftMobile]}>
               <View style={styles.profileContent}>
                 <View style={styles.glow} />
@@ -58,22 +157,23 @@ export default function Perfil() {
                     style={styles.avatar}
                   />
                 </View>
-                <Text style={[styles.name, isMobile && styles.nameMobile]}>{user}</Text>
-                <Text style={styles.role}>Caçador de Pokémons</Text>
+                <Text style={[styles.name, isMobile && styles.nameMobile]}>
+                  {displayName}
+                </Text>
+                <Text style={styles.role}>Cacador de Pokemons</Text>
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>⭐ Nível 12</Text>
+                  <Text style={styles.badgeText}>Nivel {level}</Text>
                 </View>
               </View>
             </View>
 
-            {/* RIGHT */}
             <View style={[styles.rightSection, isMobile && styles.rightMobile]}>
               <View style={styles.statHeader}>
                 <Text style={[styles.statTitle, isMobile && styles.statTitleMobile]}>
-                  Experiência
+                  Experiencia
                 </Text>
                 <Text style={[styles.statValue, isMobile && styles.statValueMobile]}>
-                  {XP_ATUAL}/{XP_TOTAL}
+                  {xpAtual}/{XP_TOTAL}
                 </Text>
               </View>
 
@@ -81,35 +181,32 @@ export default function Perfil() {
                 <View
                   style={[
                     styles.xpBarFill,
-                    { width: `${(XP_ATUAL / XP_TOTAL) * 100}%` },
+                    { width: `${(xpAtual / XP_TOTAL) * 100}%` },
                   ]}
                 />
               </View>
 
               <Text style={[styles.xpText, isMobile && styles.xpTextMobile]}>
-                Faltam {XP_TOTAL - XP_ATUAL} XP para o próximo nível
+                Faltam {XP_TOTAL - xpAtual} XP para o proximo nivel
               </Text>
 
               <View style={styles.statDivider} />
 
               <View style={[styles.grid, isMobile && styles.gridMobile]}>
                 {[
-                  { emoji: '🏆', value: 8, label: 'Vitórias' },
-                  { emoji: '💀', value: 2, label: 'Derrotas' },
-                  { emoji: '⚡', value: 151, label: 'Pokémons' },
-                  { emoji: '🔥', value: '78%', label: 'Progresso' },
-                ].map((item, i) => (
+                  { value: vitorias, label: 'Vitorias' },
+                  { value: derrotas, label: 'Derrotas' },
+                  { value: level, label: 'Nivel' },
+                  { value: aproveitamento, label: 'Aproveitamento' },
+                ].map((item) => (
                   <Pressable
-                    key={i}
-                    style={({ hovered }) => [
+                    key={item.label}
+                    style={(state: any) => [
                       styles.gridCard,
-                      hovered && isWeb && styles.gridCardHover,
+                      Boolean(state.hovered) && isWeb && styles.gridCardHover,
                       isMobile && styles.gridCardMobile,
                     ]}
                   >
-                    <Text style={[styles.gridEmoji, isMobile && styles.gridEmojiMobile]}>
-                      {item.emoji}
-                    </Text>
                     <Text style={[styles.gridNumber, isMobile && styles.gridNumberMobile]}>
                       {item.value}
                     </Text>
@@ -119,12 +216,65 @@ export default function Perfil() {
                   </Pressable>
                 ))}
               </View>
+
+              <View style={styles.actions}>
+                <Pressable
+                  style={[styles.actionButton, saving && styles.actionDisabled]}
+                  onPress={() => handleUpdateStats('win')}
+                  disabled={saving}
+                >
+                  <Text style={styles.actionText}>Registrar vitoria</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.actionButtonAlt, saving && styles.actionDisabled]}
+                  onPress={() => handleUpdateStats('loss')}
+                  disabled={saving}
+                >
+                  <Text style={styles.actionTextAlt}>Registrar derrota</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
 
         <Footer />
       </ScrollView>
+
+      <Alert
+        title={alertData.title}
+        message={alertData.message}
+        type={alertData.type}
+        visible={alertVisible}
+        onClose={() => {
+          setAlertVisible(false);
+          setConfirmAction(null);
+        }}
+        actions={
+          confirmAction
+            ? [
+                {
+                  label: 'Cancelar',
+                  variant: 'secondary',
+                  onPress: () => {
+                    setAlertVisible(false);
+                    setConfirmAction(null);
+                  },
+                },
+                {
+                  label: 'Confirmar',
+                  variant: 'primary',
+                  onPress: () => {
+                    const action = confirmAction;
+                    setAlertVisible(false);
+                    setConfirmAction(null);
+                    action?.();
+                  },
+                },
+              ]
+            : undefined
+        }
+      />
     </View>
   );
 }
@@ -352,14 +502,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
   },
 
-  gridEmoji: {
-    fontSize: 32,
-    marginBottom: 12,
-  },
-  gridEmojiMobile: {
-    fontSize: 24,
-  },
-
   gridNumber: {
     fontSize: 28,
     fontWeight: '900',
@@ -377,5 +519,43 @@ const styles = StyleSheet.create({
   },
   gridLabelMobile: {
     fontSize: 12,
+  },
+
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 22,
+  },
+
+  actionButton: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    borderRadius: 24,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+
+  actionButtonAlt: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    borderRadius: 24,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+
+  actionDisabled: {
+    opacity: 0.55,
+  },
+
+  actionText: {
+    color: Colors.white,
+    fontWeight: '900',
+  },
+
+  actionTextAlt: {
+    color: Colors.primary,
+    fontWeight: '900',
   },
 });

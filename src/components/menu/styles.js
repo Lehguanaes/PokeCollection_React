@@ -15,7 +15,8 @@ mobileWrapper: {
   alignItems: 'center',
   justifyContent: 'center',
   width: '100%',
-  zIndex: 999,
+  zIndex: 5000,
+  elevation: 5000,
 },
 
 mobileDropdownContainer: {
@@ -23,7 +24,8 @@ mobileDropdownContainer: {
   top: 62,
   left: 16,
   right: 16,
-  zIndex: 1,
+  zIndex: 5001,
+  elevation: 5001,
 },
 
   dropdownContainer: {
@@ -66,6 +68,7 @@ mobileDropdownContainer: {
     shadowRadius: 18,
     elevation: 15,
     overflow: 'hidden',
+    zIndex: 5002,
   },
 
   menuItem: {
@@ -162,7 +165,8 @@ mobileDropdownContainer: {
     height: 56,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 999,
+    zIndex: 5003,
+    elevation: 5003,
   },
 
   glow: {

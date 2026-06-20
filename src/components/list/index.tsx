@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   FlatList,
+  Platform,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -16,6 +17,8 @@ type ListProps = {
   cardPerView?: number;
   scrollEnabled?: boolean;
   contentContainerStyle?: any;
+  ListHeaderComponent?: React.ReactElement | null;
+  ListFooterComponent?: React.ReactElement | null;
 };
 
 export function List({
@@ -27,6 +30,8 @@ export function List({
   cardPerView,
   scrollEnabled = true,
   contentContainerStyle,
+  ListHeaderComponent,
+  ListFooterComponent,
 }: ListProps) {
   const { width } = useWindowDimensions();
 
@@ -36,11 +41,25 @@ export function List({
     ? columns
     : width >= 1100
     ? 3
-    : width >= 560
+    : width >= 760
     ? 2
     : 1;
 
   const itemWidth = cardPerView ? width / cardPerView - 20 : undefined;
+  const gridGap = 16;
+  const gridPadding = 24;
+  const gridItemWidth =
+    !horizontal && !cardPerView
+      ? Math.min(
+          320,
+          Math.max(
+            260,
+            (width - gridPadding - gridGap * Math.max(numColumns - 1, 0)) /
+              numColumns -
+              8
+          )
+        )
+      : undefined;
 
   if (!scrollEnabled && !horizontal) {
     const rows: any[][] = [];
@@ -55,7 +74,10 @@ export function List({
             {row.map((item, colIndex) => (
               <View
                 key={item?.id ?? item?.index ?? item?.nome ?? colIndex}
-                style={styles.itemContainer}
+                style={[
+                  styles.itemContainer,
+                  gridItemWidth ? { width: gridItemWidth } : null,
+                ]}
               >
                 {renderItemContent?.(item)}
               </View>
@@ -82,6 +104,7 @@ export function List({
           style={[
             styles.itemContainer,
             horizontal && itemWidth ? { width: itemWidth } : null,
+            gridItemWidth ? { width: gridItemWidth } : null,
           ]}
         >
           {renderItemContent?.(item)}
@@ -95,10 +118,15 @@ export function List({
       showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.5}
-      removeClippedSubviews={false}
-      initialNumToRender={8}
-      maxToRenderPerBatch={8}
-      windowSize={10}
+      removeClippedSubviews={Platform.OS !== 'web'}
+      initialNumToRender={Platform.OS === 'android' ? 4 : 8}
+      maxToRenderPerBatch={Platform.OS === 'android' ? 4 : 8}
+      updateCellsBatchingPeriod={Platform.OS === 'android' ? 60 : 30}
+      windowSize={Platform.OS === 'android' ? 5 : 10}
+      ListHeaderComponent={ListHeaderComponent}
+      ListHeaderComponentStyle={styles.fullWidthSection}
+      ListFooterComponent={ListFooterComponent}
+      ListFooterComponentStyle={styles.fullWidthSection}
     />
   );
 }

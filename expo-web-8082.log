@@ -166,3 +166,67 @@ Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░
 Web Bundled 826ms node_modules\expo-router\entry.js (1 module)
 Web Bundled 62ms node_modules\expo-router\entry.js (1 module)
  LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 916ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 2369ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 561ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1436ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 95ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 699ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 350ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Unable to resolve "./styles" from "src\components\list\index.tsx"
+[0m [90m  7 |[39m } [36mfrom[39m [32m'react-native'[39m[33m;[39m
+ [90m  8 |[39m
+[31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m { styles } [36mfrom[39m [32m'./styles'[39m[33m;[39m
+ [90m    |[39m                         [31m[1m^[22m[39m
+ [90m 10 |[39m
+ [90m 11 |[39m type [33mListProps[39m [33m=[39m {
+ [90m 12 |[39m   data[33m:[39m any[][33m;[39m[0m
+
+Import stack:
+
+ src\components\list\index.tsx
+ | import "./styles"
+
+ src\app\(app)\team.tsx
+ | import "@/components/list"
+
+ src\app (require.context)
+
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 123ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1249ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 111ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1186ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 60ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+λ Bundled 200ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 987ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 218ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 151ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1072ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 218ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 2573ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 149ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 122ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 939ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 590ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1125ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 291ms node_modules\expo-router\entry.js (1 module)
+λ Bundled 128ms node_modules\expo-router\node\render.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web Bundled 940ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 132ms node_modules\expo-router\node\render.js (1 module)
+Web Bundled 1028ms node_modules\expo-router\entry.js (1 module)

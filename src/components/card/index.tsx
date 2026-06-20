@@ -49,6 +49,8 @@ interface CardProps {
   showStats?: boolean;
 
   compact?: boolean;
+
+  animated?: boolean;
 }
 
 const STAT_ABBR: Record<
@@ -72,6 +74,7 @@ export function Card({
   showDetailsButton = false,
   showStats = false,
   compact = false,
+  animated = Platform.OS !== 'android',
 }: CardProps) {
   const [visible, setVisible] =
     useState(false);
@@ -105,6 +108,8 @@ export function Card({
     hpStat?.forca ?? 0;
 
   useEffect(() => {
+    if (!animated) return;
+
     Animated.loop(
       Animated.sequence([
         Animated.timing(
@@ -146,7 +151,7 @@ export function Card({
         ),
       ])
     ).start();
-  }, []);
+  }, [animated]);
 
   const handleHoverIn = () => {
     setHovered(true);
@@ -337,12 +342,14 @@ export function Card({
                   : styles.pokemonImage,
 
                 {
-                  transform: [
-                    {
-                      translateY:
-                        floatAnim,
-                    },
-                  ],
+                  transform: animated
+                    ? [
+                        {
+                          translateY:
+                            floatAnim,
+                        },
+                      ]
+                    : [],
                 },
               ]}
               resizeMode="contain"

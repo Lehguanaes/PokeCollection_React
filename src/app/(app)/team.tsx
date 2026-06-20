@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Animated,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -24,7 +25,7 @@ import {
   deleteCapturedPokemon,
   getUserTeam,
   updateUserTeam,
-} from '@/integration/pokemonIntegration';
+} from '@/integration/kleberIntegration';
 
 const mapType = (t: string) => TYPE_MAP[t] ?? 'normal';
 
@@ -50,7 +51,7 @@ export default function Team() {
   const { width } = useWindowDimensions();
 
   const isMobile = width < 560;
-  const pokedexColumns = width >= 1100 ? 3 : width >= 560 ? 2 : 1;
+  const pokedexColumns = width >= 1120 ? 3 : width >= 760 ? 2 : 1;
 
   const loadTeam = useCallback(async () => {
     if (!userId) {
@@ -111,7 +112,7 @@ export default function Team() {
     if (width >= 1100) {
       return [myTeam.slice(0, 2), myTeam.slice(2, 5)];
     }
-    if (width >= 560) {
+    if (width >= 760) {
       return [
         myTeam.slice(0, 2),
         myTeam.slice(2, 4),
@@ -307,7 +308,7 @@ export default function Team() {
           showStats
         />
 
-        <View style={styles.cardActions}>
+        <View style={[styles.cardActions, isMobile && styles.cardActionsMobile]}>
           <Pressable
             style={[
               styles.actionButton,
@@ -541,22 +542,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardActions: {
-    width: '92%',
-    gap: 8,
-    marginTop: 14,
-    marginBottom: 24,
+    width: '94%',
+    gap: 12,
+    marginTop: 18,
+    marginBottom: 30,
+  },
+  cardActionsMobile: {
+    width: Platform.OS === 'android' ? '100%' : '96%',
+    maxWidth: 280,
+    paddingHorizontal: Platform.OS === 'android' ? 8 : 0,
   },
   actionButton: {
     backgroundColor: Colors.primary,
-    borderRadius: 22,
-    paddingVertical: 12,
+    borderRadius: 24,
+    minHeight: 54,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   deleteButton: {
     backgroundColor: Colors.white,
-    borderRadius: 22,
-    paddingVertical: 12,
+    borderRadius: 24,
+    minHeight: 54,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: Colors.primary,
   },
@@ -566,10 +578,14 @@ const styles = StyleSheet.create({
   actionText: {
     color: Colors.white,
     fontWeight: '900',
+    fontSize: 14,
+    textAlign: 'center',
   },
   deleteText: {
     color: Colors.primary,
     fontWeight: '900',
+    fontSize: 14,
+    textAlign: 'center',
   },
   emptyText: {
     color: Colors.subtitle,

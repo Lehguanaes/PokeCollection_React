@@ -10,6 +10,8 @@ const CONTAINER_HEIGHT_MOBILE = 78;
 
 export const styles = StyleSheet.create({
   container: {
+    width: '100%',
+    alignSelf: 'stretch',
     height: CONTAINER_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',

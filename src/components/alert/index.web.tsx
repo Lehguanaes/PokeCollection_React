@@ -62,7 +62,13 @@ const AlertWeb: React.FC<AlertProps> = ({
     },
   };
 
-  const currentColors = semanticColors[type];
+  const currentColors = hasActions
+    ? {
+        bg: '#E9FFF7',
+        border: Colors.primary,
+        text: '#1F4F43',
+      }
+    : semanticColors[type];
 
   return (
     <Modal

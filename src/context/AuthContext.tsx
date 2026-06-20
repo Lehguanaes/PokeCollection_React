@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loginUser, registerUser } from '@/integration/pokemonIntegration';
+import { loginUser, registerUser } from '@/integration/kleberIntegration';
 
 type AuthContextData = {
   isAuthenticated: boolean;

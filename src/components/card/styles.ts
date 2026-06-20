@@ -9,6 +9,7 @@ export const styles =
   StyleSheet.create({
     card: {
       width: 260,
+      maxWidth: '100%',
       backgroundColor:
         Colors.white,
       borderRadius: 28,
@@ -45,6 +46,7 @@ export const styles =
 
     compactCard: {
       width: 230,
+      maxWidth: '100%',
       minHeight: 300,
       backgroundColor:
         Colors.white,

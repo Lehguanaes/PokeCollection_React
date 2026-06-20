@@ -2,7 +2,8 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
+    paddingTop: 0,
+    paddingBottom: 20,
     paddingHorizontal: 12,
     alignItems: 'center',
   },
@@ -18,6 +19,12 @@ export const styles = StyleSheet.create({
   itemContainer: {
     alignItems: 'center',
     margin: 4,
-    width: 280,   // ✅ largura fixa do card — ajuste conforme o tamanho do seu Card
+    width: 280,
+    maxWidth: '100%',
+  },
+
+  fullWidthSection: {
+    alignSelf: 'stretch',
+    marginHorizontal: -12,
   },
 });

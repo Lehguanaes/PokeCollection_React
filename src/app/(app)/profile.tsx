@@ -21,7 +21,7 @@ import {
   getProfileStats,
   ProfileStats,
   updateProfileStats,
-} from '@/integration/pokemonIntegration';
+} from '@/integration/kleberIntegration';
 
 const isWeb = Platform.OS === 'web';
 const XP_TOTAL = 100;

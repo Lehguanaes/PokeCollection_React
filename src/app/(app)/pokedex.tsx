@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Animated,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -14,15 +14,15 @@ import { Background } from '@/components/background';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Menu } from '@/components/menu';
-import { Card } from '@/components/card';
+import { PokemonCard } from '@/components/pokemonCard';
 import { List } from '@/components/list';
 import { Alert } from '@/components/alert';
 import { Colors } from '@/constants/colors';
 import {
   addCapturedPokemon,
-  getPokemons,
   getUserTeam,
-} from '@/integration/pokemonIntegration';
+} from '@/integration/kleberIntegration';
+import { getPokemons } from '@/integration/pokemonIntegration';
 import { Pokemon } from '@/@types/pokemon';
 import { TYPE_MAP } from '@/constants/pokemon';
 
@@ -258,8 +258,9 @@ export default function Pokedex() {
     type: 'info' as 'success' | 'error' | 'warning' | 'info',
   });
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const captureProgress = React.useRef(new Animated.Value(0)).current;
 
-  const columns = width >= 1100 ? 3 : width >= 560 ? 2 : 1;
+  const columns = width >= 1120 ? 3 : width >= 760 ? 2 : 1;
 
   useEffect(() => {
     injectCaptureStyles();
@@ -287,6 +288,22 @@ export default function Pokedex() {
     }
     loadData();
   }, [userId]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    if (savingPokemon === null) {
+      captureProgress.setValue(0);
+      return;
+    }
+
+    captureProgress.setValue(0);
+    Animated.timing(captureProgress, {
+      toValue: 1,
+      duration: CAPTURE_ANIMATION_MS,
+      useNativeDriver: true,
+    }).start();
+  }, [captureProgress, savingPokemon]);
 
   const capturedIdSet = useMemo(() => new Set(capturedIds), [capturedIds]);
 
@@ -377,15 +394,92 @@ export default function Pokedex() {
         .filter(Boolean)
         .join(' ');
       const cardContent = (
-        <Card
+        <PokemonCard
           title={item.nome}
           image={{ uri: item.imagem }}
           tipos={tipos}
           poderes={item.poderes}
           index={pokemonId}
           showDetailsButton
+          animated={Platform.OS !== 'android'}
         />
       );
+      const nativeCardStyle =
+        Platform.OS !== 'web' && isCapturing
+          ? {
+              opacity: captureProgress.interpolate({
+                inputRange: [0, 0.35, 0.72, 1],
+                outputRange: [1, 1, 0.2, 0],
+              }),
+              transform: [
+                {
+                  scale: captureProgress.interpolate({
+                    inputRange: [0, 0.35, 0.72, 1],
+                    outputRange: [1, 1.04, 0.58, 0.18],
+                  }),
+                },
+                {
+                  translateY: captureProgress.interpolate({
+                    inputRange: [0, 0.55, 1],
+                    outputRange: [0, -28, -76],
+                  }),
+                },
+              ],
+            }
+          : null;
+      const nativeBallStyle =
+        Platform.OS !== 'web' && isCapturing
+          ? {
+              opacity: captureProgress.interpolate({
+                inputRange: [0, 0.08, 0.95, 1],
+                outputRange: [0, 1, 1, 0],
+              }),
+              transform: [
+                {
+                  translateY: captureProgress.interpolate({
+                    inputRange: [0, 0.55, 1],
+                    outputRange: [72, -118, -118],
+                  }),
+                },
+                {
+                  rotate: captureProgress.interpolate({
+                    inputRange: [0, 0.55, 0.68, 0.78, 0.88, 1],
+                    outputRange: [
+                      '-30deg',
+                      '360deg',
+                      '386deg',
+                      '334deg',
+                      '376deg',
+                      '360deg',
+                    ],
+                  }),
+                },
+                {
+                  scale: captureProgress.interpolate({
+                    inputRange: [0, 0.55, 1],
+                    outputRange: [0.78, 1.08, 1],
+                  }),
+                },
+              ],
+            }
+          : null;
+      const nativeSuccessStyle =
+        Platform.OS !== 'web' && isCapturing
+          ? {
+              opacity: captureProgress.interpolate({
+                inputRange: [0, 0.76, 0.9, 1],
+                outputRange: [0, 0, 1, 1],
+              }),
+              transform: [
+                {
+                  scale: captureProgress.interpolate({
+                    inputRange: [0, 0.82, 1],
+                    outputRange: [0.86, 1.06, 1],
+                  }),
+                },
+              ],
+            }
+          : null;
       const captureButton = (
         <Pressable
           style={[
@@ -426,12 +520,27 @@ export default function Pokedex() {
 
       return (
         <View key={item.index} style={styles.cardWithAction}>
-          {cardContent}
+          <Animated.View style={nativeCardStyle}>{cardContent}</Animated.View>
+          {isCapturing && (
+            <>
+              <Animated.View style={[styles.nativeCaptureBall, nativeBallStyle]}>
+                <View style={styles.nativeBallTop} />
+                <View style={styles.nativeBallLine} />
+                <View style={styles.nativeBallCenter} />
+              </Animated.View>
+              <Animated.View
+                pointerEvents="none"
+                style={[styles.nativeCapturePulse, nativeSuccessStyle]}
+              >
+                <Text style={styles.nativeCaptureText}>Capturado!</Text>
+              </Animated.View>
+            </>
+          )}
           {captureButton}
         </View>
       );
     },
-    [capturedIdSet, confirmCapture, savingPokemon]
+    [captureProgress, capturedIdSet, confirmCapture, savingPokemon]
   );
 
   if (loading) {
@@ -443,32 +552,26 @@ export default function Pokedex() {
       <Background />
 
       {!isMobile && <Menu />}
+      <Header />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+      <List
+        data={pokemons}
+        columns={columns}
+        renderItemContent={renderPokemonCard}
         contentContainerStyle={styles.scrollContent}
-      >
-        <Header />
-
-        <View style={styles.header}>
-          <Text style={[styles.title, isMobile && styles.titleMobile]}>
-            Bem-vindo a Pokedex, {user}!
-          </Text>
-          <View style={[styles.line, isMobile && styles.lineMobile]} />
-          <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
-            Explore os 151 primeiros pokemons e capture para sua conta
-          </Text>
-        </View>
-
-        <List
-          data={pokemons}
-          columns={columns}
-          renderItemContent={renderPokemonCard}
-          scrollEnabled={false}
-        />
-
-        <Footer />
-      </ScrollView>
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text style={[styles.title, isMobile && styles.titleMobile]}>
+              Bem-vindo a Pokedex, {user}!
+            </Text>
+            <View style={[styles.line, isMobile && styles.lineMobile]} />
+            <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
+              Explore os 151 primeiros pokemons e capture para sua conta
+            </Text>
+          </View>
+        }
+        ListFooterComponent={<Footer />}
+      />
 
       <Alert
         title={alertData.title}
@@ -543,6 +646,7 @@ const styles = StyleSheet.create({
   },
   line: {
     width: 355,
+    maxWidth: '80%',
     height: 5,
     backgroundColor: Colors.text,
     alignSelf: 'center',
@@ -557,10 +661,12 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   captureButton: {
-    width: '86%',
+    width: '92%',
+    minHeight: 56,
     backgroundColor: Colors.primary,
     borderRadius: 999,
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 16,
@@ -584,6 +690,7 @@ const styles = StyleSheet.create({
   captureButtonText: {
     color: Colors.white,
     fontWeight: '900',
+    fontSize: 15,
     letterSpacing: 0.3,
     zIndex: 2,
   },
@@ -599,5 +706,64 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.16)',
     transform: [{ rotate: '-16deg' }],
+  },
+  nativeCaptureBall: {
+    position: 'absolute',
+    left: '50%',
+    bottom: 76,
+    width: 46,
+    height: 46,
+    marginLeft: -23,
+    borderRadius: 999,
+    backgroundColor: Colors.white,
+    borderWidth: 3,
+    borderColor: Colors.gray[800],
+    overflow: 'hidden',
+    zIndex: 20,
+    elevation: 20,
+  },
+  nativeBallTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    backgroundColor: '#E83F45',
+  },
+  nativeBallLine: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    height: 5,
+    backgroundColor: Colors.gray[800],
+  },
+  nativeBallCenter: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    width: 18,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: Colors.white,
+    borderWidth: 3,
+    borderColor: Colors.gray[800],
+  },
+  nativeCapturePulse: {
+    position: 'absolute',
+    top: 150,
+    alignSelf: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 999,
+    backgroundColor: Colors.white,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    zIndex: 21,
+    elevation: 21,
+  },
+  nativeCaptureText: {
+    color: Colors.gray[800],
+    fontWeight: '900',
   },
 });

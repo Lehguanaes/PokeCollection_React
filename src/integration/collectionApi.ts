@@ -1,11 +1,16 @@
 import axios from 'axios';
 import { Pokemon } from '../@types/pokemon';
 
-const kleberApi = axios.create({
-  baseURL: 'https://lnh1dhp1mj.execute-api.us-east-1.amazonaws.com/api-pokemon',
+const DEFAULT_POKEMON_API_URL =
+  'https://lnh1dhp1mj.execute-api.us-east-1.amazonaws.com/api-pokemon';
+
+const collectionApi = axios.create({
+  baseURL:
+    process.env.EXPO_PUBLIC_POKEMON_API_URL?.replace(/\/$/, '') ||
+    DEFAULT_POKEMON_API_URL,
 });
 
-export type AuthResponse = {
+export type PokemonProfileResponse = {
   userId: string;
 };
 
@@ -46,11 +51,11 @@ const mapApiPokemon = (pokemon: ApiPokemon): Pokemon => ({
   })),
 });
 
-export const registerUser = async (
+export const createPokemonProfile = async (
   username: string,
   password: string
-): Promise<AuthResponse> => {
-  const response = await kleberApi.post('/auth/v1/register', {
+): Promise<PokemonProfileResponse> => {
+  const response = await collectionApi.post('/auth/v1/register', {
     username,
     password,
   });
@@ -58,11 +63,11 @@ export const registerUser = async (
   return response.data;
 };
 
-export const loginUser = async (
+export const getPokemonProfileId = async (
   username: string,
   password: string
-): Promise<AuthResponse> => {
-  const response = await kleberApi.post('/auth/v1/login', {
+): Promise<PokemonProfileResponse> => {
+  const response = await collectionApi.post('/auth/v1/login', {
     username,
     password,
   });
@@ -73,7 +78,7 @@ export const loginUser = async (
 export const getProfileStats = async (
   userId: string
 ): Promise<ProfileStats> => {
-  const response = await kleberApi.get(`/auth/v1/stats/${userId}`);
+  const response = await collectionApi.get(`/auth/v1/stats/${userId}`);
 
   return response.data;
 };
@@ -82,7 +87,7 @@ export const updateProfileStats = async (
   userId: string,
   stats: Pick<ProfileStats, 'level' | 'vitorias' | 'derrotas'>
 ): Promise<ProfileStats> => {
-  const response = await kleberApi.put(`/auth/v1/stats/${userId}`, {
+  const response = await collectionApi.put(`/auth/v1/stats/${userId}`, {
     level: String(stats.level),
     vitorias: String(stats.vitorias),
     derrotas: String(stats.derrotas),
@@ -94,7 +99,7 @@ export const updateProfileStats = async (
 export const getUserTeam = async (
   userId: string
 ): Promise<{ team: Pokemon[]; capture: Pokemon[] }> => {
-  const response = await kleberApi.get<TeamResponse>('/pokemon/v1/team', {
+  const response = await collectionApi.get<TeamResponse>('/pokemon/v1/team', {
     params: {
       'user-id': userId,
     },
@@ -111,7 +116,7 @@ export const updateUserTeam = async (
   removedPokemon: number,
   newPokemon: number
 ) => {
-  await kleberApi.put(
+  await collectionApi.put(
     '/pokemon/v1/team',
     {
       removedPokemon,
@@ -129,7 +134,7 @@ export const addCapturedPokemon = async (
   userId: string,
   pokemonId: number
 ) => {
-  await kleberApi.put('/pokemon/v1/captured', null, {
+  await collectionApi.put('/pokemon/v1/captured', null, {
     params: {
       'user-id': userId,
       'pokemon-id': pokemonId,
@@ -141,7 +146,7 @@ export const deleteCapturedPokemon = async (
   userId: string,
   pokemonId: number
 ) => {
-  await kleberApi.delete('/pokemon/v1/captured', {
+  await collectionApi.delete('/pokemon/v1/captured', {
     params: {
       'user-id': userId,
       'pokemon-id': pokemonId,

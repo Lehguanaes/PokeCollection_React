@@ -111,7 +111,7 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
 </table>
 
 <h3 align="center">
- Trabalho orientado por Professor Kleber Nunes.
+ Projeto desenvolvido em ambiente academico.
 </h3>
 
 <h3 align="center">
@@ -124,3 +124,13 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
  __________________
   
 </h3>
+
+## Atualmente Autenticacao local
+
+A autenticacao usa a API de Login para executar o fluxo completo no Windows:
+
+1. Instale o MongoDB Community Server como servico.
+2. Mantenha a pasta `loginApi` dentro de `Downloads` ou informe outro caminho na variavel `AUTH_API_PROJECT_DIR`.
+3. Execute `npm run web:authenticated` na pasta principal do projeto.
+
+Esse comando prepara o Maven portatil, compila e inicia a API em `http://localhost:8082/fatec/login`, e abre o Expo Web na porta `8081`. As URLs configuraveis estao documentadas em `.env.example`.

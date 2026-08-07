@@ -3,6 +3,7 @@
 
 # dependencies
 node_modules/
+.local-auth/
 
 # Expo
 .expo/

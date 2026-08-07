@@ -21,7 +21,7 @@ import {
   getProfileStats,
   ProfileStats,
   updateProfileStats,
-} from '@/integration/kleberIntegration';
+} from '@/integration/collectionApi';
 
 const isWeb = Platform.OS === 'web';
 const XP_TOTAL = 100;
@@ -138,7 +138,7 @@ export default function Perfil() {
         </Text>
         <View style={[styles.line, isMobile && styles.lineMobile]} />
         <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
-          Status carregados da API do professor
+          Status sincronizados com a colecao
         </Text>
 
         <View style={styles.content}>

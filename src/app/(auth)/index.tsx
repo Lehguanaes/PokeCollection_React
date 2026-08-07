@@ -9,7 +9,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Alert } from '@/components/alert';
@@ -22,18 +21,44 @@ import { Colors } from '@/constants/colors';
 
 function getAuthErrorMessage(error: unknown) {
   if (axios.isAxiosError(error)) {
-    const apiMessage = error.response?.data?.message;
+    const responseData = error.response?.data;
+    const apiMessage =
+      typeof responseData === 'string' ? responseData : responseData?.message;
 
     if (apiMessage) {
       return apiMessage;
     }
 
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      return 'Usuario ou senha invalidos.';
+    }
+
     if (error.message === 'Network Error') {
-      return 'Nao foi possivel acessar a API pelo navegador. Se estiver no web, pode ser bloqueio de CORS da API do professor.';
+      return 'Nao foi possivel acessar a API de autenticacao. Verifique se o servico esta ativo e se a URL foi configurada corretamente.';
     }
   }
 
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
   return 'Nao foi possivel concluir a acao. Confira os dados e tente novamente.';
+}
+
+function normalizeEmail(value: string) {
+  return value.replace(/\s/g, '').toLowerCase();
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function formatCep(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+
+  if (digits.length <= 5) return digits;
+
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
 }
 
 export default function App() {
@@ -42,6 +67,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState('');
+  const [cep, setCep] = useState('');
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
   const [isAlertVisible, setIsAlertVisible] = useState(false);
@@ -60,10 +87,41 @@ export default function App() {
   }, []);
 
   async function validateCredentials() {
-    if (!name.trim() || !senha.trim()) {
+    const normalizedEmail = normalizeEmail(email);
+    const cepDigits = cep.replace(/\D/g, '');
+
+    if (
+      !name.trim() ||
+      !senha.trim() ||
+      (mode === 'register' &&
+        (!normalizedEmail || !cepDigits))
+    ) {
       setAlertData({
         title: 'Campos obrigatorios',
-        message: 'Informe usuario e senha para continuar.',
+        message:
+          mode === 'register'
+            ? 'Preencha usuario, senha, email e CEP.'
+            : 'Informe usuario e senha para continuar.',
+        type: 'warning',
+      });
+      setIsAlertVisible(true);
+      return;
+    }
+
+    if (mode === 'register' && !isValidEmail(normalizedEmail)) {
+      setAlertData({
+        title: 'Email invalido',
+        message: 'Informe um email valido, por exemplo: nome@email.com.',
+        type: 'warning',
+      });
+      setIsAlertVisible(true);
+      return;
+    }
+
+    if (mode === 'register' && cepDigits.length !== 8) {
+      setAlertData({
+        title: 'CEP invalido',
+        message: 'O CEP precisa conter oito numeros.',
         type: 'warning',
       });
       setIsAlertVisible(true);
@@ -74,17 +132,15 @@ export default function App() {
 
     try {
       if (mode === 'register') {
-        await signUp(name.trim(), senha);
+        await signUp({
+          username: name.trim(),
+          password: senha,
+          email: normalizedEmail,
+          cep: cepDigits,
+        });
       } else {
         await signIn(name.trim(), senha);
       }
-
-      router.push({
-        pathname: '/team',
-        params: {
-          username: name.trim(),
-        },
-      });
     } catch (error) {
       console.error('Erro de autenticacao:', error);
 
@@ -169,6 +225,8 @@ export default function App() {
         onFocus={onFocus}
         onBlur={onBlur}
         animatedStyle={animatedStyle}
+        autoCapitalize="none"
+        autoCorrect={false}
         returnKeyType="next"
       />
 
@@ -181,9 +239,41 @@ export default function App() {
         onFocus={onFocus}
         onBlur={onBlur}
         animatedStyle={animatedStyle}
-        onSubmitEditing={validateCredentials}
-        returnKeyType="done"
+        onSubmitEditing={mode === 'login' ? validateCredentials : undefined}
+        returnKeyType={mode === 'login' ? 'done' : 'next'}
       />
+
+      {mode === 'register' && (
+        <>
+          <Input
+            label="EMAIL"
+            placeholder="Informe seu email"
+            value={email}
+            onChangeText={(value) => setEmail(normalizeEmail(value))}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            animatedStyle={animatedStyle}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            returnKeyType="next"
+          />
+
+          <Input
+            label="CEP"
+            placeholder="00000-000"
+            value={cep}
+            onChangeText={(value) => setCep(formatCep(value))}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            animatedStyle={animatedStyle}
+            keyboardType="numeric"
+            maxLength={9}
+            onSubmitEditing={validateCredentials}
+            returnKeyType="done"
+          />
+        </>
+      )}
 
       <Button
         title={mode === 'register' ? 'Cadastrar' : 'Entrar'}

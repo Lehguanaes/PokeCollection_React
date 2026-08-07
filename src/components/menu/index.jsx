@@ -25,6 +25,7 @@ import {
 } from 'lucide-react-native';
 
 import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 import { styles } from './styles';
 
 const MENU_ITEMS = [
@@ -46,13 +47,14 @@ const MENU_ITEMS = [
   {
     label: 'Desconectar',
     icon: LogOut,
-    route: '/',
+    action: 'logout',
   },
 ];
 
 export function Menu() {
   const router = useRouter();
   const pathname = usePathname();
+  const { signOut } = useAuth();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -100,8 +102,14 @@ export function Menu() {
     ]).start();
   }
 
-  function navigateTo(route) {
-    router.push(route);
+  async function handleItemPress(item) {
+    if (item.action === 'logout') {
+      await signOut();
+      router.replace('/');
+      return;
+    }
+
+    router.push(item.route);
     toggleMenu();
   }
 
@@ -145,11 +153,11 @@ export function Menu() {
 
           {MENU_ITEMS.map((item, index) => {
             const Icon = item.icon;
-            const active = pathname === item.route;
+            const active = item.route && pathname === item.route;
 
             return (
               <Animated.View
-                key={item.route}
+                key={item.route ?? item.action}
                 style={{
                   opacity: menuAnim,
                   transform: [
@@ -163,7 +171,7 @@ export function Menu() {
                 }}
               >
                 <Pressable
-                  onPress={() => navigateTo(item.route)}
+                  onPress={() => handleItemPress(item)}
                   style={({ pressed }) => [
                     isMobile ? styles.mobileMenuItem : styles.menuItem,
                     active && styles.activeItem,

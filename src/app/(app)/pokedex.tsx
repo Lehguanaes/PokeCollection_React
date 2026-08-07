@@ -21,7 +21,7 @@ import { Colors } from '@/constants/colors';
 import {
   addCapturedPokemon,
   getUserTeam,
-} from '@/integration/kleberIntegration';
+} from '@/integration/collectionApi';
 import { getPokemons } from '@/integration/pokemonIntegration';
 import { Pokemon } from '@/@types/pokemon';
 import { TYPE_MAP } from '@/constants/pokemon';

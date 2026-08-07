@@ -25,7 +25,7 @@ import {
   deleteCapturedPokemon,
   getUserTeam,
   updateUserTeam,
-} from '@/integration/kleberIntegration';
+} from '@/integration/collectionApi';
 
 const mapType = (t: string) => TYPE_MAP[t] ?? 'normal';
 

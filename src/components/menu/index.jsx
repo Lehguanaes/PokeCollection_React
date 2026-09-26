@@ -9,6 +9,7 @@ import {
   Text,
   Pressable,
   Animated,
+  Platform,
   useWindowDimensions,
 } from 'react-native';
 
@@ -21,6 +22,8 @@ import {
   User,
   Trophy,
   Cat,
+  Camera,
+  MapPin,
   LogOut,
 } from 'lucide-react-native';
 
@@ -45,6 +48,16 @@ const MENU_ITEMS = [
     route: '/pokedex',
   },
   {
+    label: 'Anexos',
+    icon: Camera,
+    route: '/camera',
+  },
+  {
+    label: 'Mapa',
+    icon: MapPin,
+    route: '/map',
+  },
+  {
     label: 'Desconectar',
     icon: LogOut,
     action: 'logout',
@@ -54,9 +67,20 @@ const MENU_ITEMS = [
 export function Menu() {
   const router = useRouter();
   const pathname = usePathname();
-  const { signOut } = useAuth();
+  const { signOut, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const availableMenuItems = isAuthenticated
+    ? MENU_ITEMS
+    : MENU_ITEMS.filter(
+        (item) => item.route === '/map' || item.route === '/camera'
+      );
+  const visibleMenuItems =
+    Platform.OS === 'web'
+      ? availableMenuItems.filter(
+          (item) => item.route !== '/map' && item.route !== '/camera'
+        )
+      : availableMenuItems;
 
   const [open, setOpen] = useState(false);
 
@@ -151,7 +175,7 @@ export function Menu() {
         <View style={isMobile ? styles.mobileDropdown : styles.dropdown}>
           <View style={styles.dropdownGlow} />
 
-          {MENU_ITEMS.map((item, index) => {
+          {visibleMenuItems.map((item, index) => {
             const Icon = item.icon;
             const active = item.route && pathname === item.route;
 

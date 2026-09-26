@@ -10,10 +10,6 @@ const collectionApi = axios.create({
     DEFAULT_POKEMON_API_URL,
 });
 
-export type PokemonProfileResponse = {
-  userId: string;
-};
-
 export type ProfileStats = {
   userId: string;
   username: string;
@@ -50,30 +46,6 @@ const mapApiPokemon = (pokemon: ApiPokemon): Pokemon => ({
     forca: ability.strength,
   })),
 });
-
-export const createPokemonProfile = async (
-  username: string,
-  password: string
-): Promise<PokemonProfileResponse> => {
-  const response = await collectionApi.post('/auth/v1/register', {
-    username,
-    password,
-  });
-
-  return response.data;
-};
-
-export const getPokemonProfileId = async (
-  username: string,
-  password: string
-): Promise<PokemonProfileResponse> => {
-  const response = await collectionApi.post('/auth/v1/login', {
-    username,
-    password,
-  });
-
-  return response.data;
-};
 
 export const getProfileStats = async (
   userId: string

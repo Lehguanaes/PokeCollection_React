@@ -53,14 +53,6 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function formatCep(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-
-  if (digits.length <= 5) return digits;
-
-  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
-}
-
 export default function App() {
   const { signIn, signUp } = useAuth();
 
@@ -68,7 +60,6 @@ export default function App() {
   const [name, setName] = useState('');
   const [senha, setSenha] = useState('');
   const [email, setEmail] = useState('');
-  const [cep, setCep] = useState('');
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
   const [isAlertVisible, setIsAlertVisible] = useState(false);
@@ -88,19 +79,12 @@ export default function App() {
 
   async function validateCredentials() {
     const normalizedEmail = normalizeEmail(email);
-    const cepDigits = cep.replace(/\D/g, '');
-
-    if (
-      !name.trim() ||
-      !senha.trim() ||
-      (mode === 'register' &&
-        (!normalizedEmail || !cepDigits))
-    ) {
+    if (!name.trim() || !senha.trim() || (mode === 'register' && !normalizedEmail)) {
       setAlertData({
         title: 'Campos obrigatorios',
         message:
           mode === 'register'
-            ? 'Preencha usuario, senha, email e CEP.'
+            ? 'Preencha usuario, senha e email.'
             : 'Informe usuario e senha para continuar.',
         type: 'warning',
       });
@@ -118,16 +102,6 @@ export default function App() {
       return;
     }
 
-    if (mode === 'register' && cepDigits.length !== 8) {
-      setAlertData({
-        title: 'CEP invalido',
-        message: 'O CEP precisa conter oito numeros.',
-        type: 'warning',
-      });
-      setIsAlertVisible(true);
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -136,7 +110,6 @@ export default function App() {
           username: name.trim(),
           password: senha,
           email: normalizedEmail,
-          cep: cepDigits,
         });
       } else {
         await signIn(name.trim(), senha);
@@ -218,8 +191,8 @@ export default function App() {
   const form = (
     <>
       <Input
-        label="USUARIO"
-        placeholder="Informe seu usuario"
+        label="USUARIO OU E-MAIL"
+        placeholder="Informe seu usuario ou e-mail"
         value={name}
         onChangeText={setName}
         onFocus={onFocus}
@@ -256,22 +229,10 @@ export default function App() {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
-            returnKeyType="next"
-          />
-
-          <Input
-            label="CEP"
-            placeholder="00000-000"
-            value={cep}
-            onChangeText={(value) => setCep(formatCep(value))}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            animatedStyle={animatedStyle}
-            keyboardType="numeric"
-            maxLength={9}
             onSubmitEditing={validateCredentials}
             returnKeyType="done"
           />
+
         </>
       )}
 
@@ -290,6 +251,7 @@ export default function App() {
           {mode === 'register' ? 'Ja tenho conta' : 'Criar conta'}
         </Text>
       </Pressable>
+
     </>
   );
 
@@ -466,4 +428,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+
 });

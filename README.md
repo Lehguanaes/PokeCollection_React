@@ -125,12 +125,6 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
   
 </h3>
 
-## Atualmente Autenticacao local
+## Autenticacao
 
-A autenticacao usa a API de Login para executar o fluxo completo no Windows:
-
-1. Instale o MongoDB Community Server como servico.
-2. Mantenha a pasta `loginApi` dentro de `Downloads` ou informe outro caminho na variavel `AUTH_API_PROJECT_DIR`.
-3. Execute `npm run web:authenticated` na pasta principal do projeto.
-
-Esse comando prepara o Maven portatil, compila e inicia a API em `http://localhost:8082/fatec/login`, e abre o Expo Web na porta `8081`. As URLs configuraveis estao documentadas em `.env.example`.
+Cadastro e login usam exclusivamente a API externa configurada em `EXPO_PUBLIC_AUTH_API_URL`. A sessao e mantida pelo cookie `HttpOnly` retornado pelo servidor; o aplicativo nao le nem armazena tokens de autenticacao.

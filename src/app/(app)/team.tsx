@@ -334,56 +334,58 @@ export default function Team() {
 
   return (
     <View style={styles.wrapper}>
-      <Background />
       {!isMobile && <Menu />}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Header />
+        <View style={styles.pageContent}>
+          <Background />
+          <Header />
 
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
-            Meu Time Escolhido
-          </Text>
-          <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
-          <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
-            Toque em um Pokemon do time para escolher quem sera trocado
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
+              Meu Time Escolhido
+            </Text>
+            <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
+            <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
+              Toque em um Pokemon do time para escolher quem sera trocado
+            </Text>
+          </View>
+
+          <View style={styles.teamContainer}>
+            {teamRows.map((row, idx) => (
+              <View key={idx} style={styles.teamRow}>
+                {row.map(renderMyTeamCard)}
+              </View>
+            ))}
+          </View>
+
+          <View style={[styles.sectionHeader, styles.sectionHeaderList]}>
+            <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
+              Pokemons Capturados
+            </Text>
+            <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
+            <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
+              {capturedPokemons.length} capturados pela API
+            </Text>
+          </View>
+
+          {capturedPokemons.length ? (
+            <List
+              data={capturedPokemons}
+              columns={pokedexColumns}
+              scrollEnabled={false}
+              renderItemContent={renderCapturedCard}
+              contentContainerStyle={styles.listContent}
+            />
+          ) : (
+            <Text style={styles.emptyText}>
+              Nenhum Pokemon capturado ainda. Capture pela Pokedex.
+            </Text>
+          )}
         </View>
-
-        <View style={styles.teamContainer}>
-          {teamRows.map((row, idx) => (
-            <View key={idx} style={styles.teamRow}>
-              {row.map(renderMyTeamCard)}
-            </View>
-          ))}
-        </View>
-
-        <View style={[styles.sectionHeader, styles.sectionHeaderList]}>
-          <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>
-            Pokemons Capturados
-          </Text>
-          <View style={[styles.sectionAccent, isMobile && styles.sectionAccentMobile]} />
-          <Text style={[styles.sectionSub, isMobile && styles.sectionSubMobile]}>
-            {capturedPokemons.length} capturados pela API
-          </Text>
-        </View>
-
-        {capturedPokemons.length ? (
-          <List
-            data={capturedPokemons}
-            columns={pokedexColumns}
-            scrollEnabled={false}
-            renderItemContent={renderCapturedCard}
-            contentContainerStyle={styles.listContent}
-          />
-        ) : (
-          <Text style={styles.emptyText}>
-            Nenhum Pokemon capturado ainda. Capture pela Pokedex.
-          </Text>
-        )}
 
         <Footer />
       </ScrollView>
@@ -437,6 +439,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 0,
     flexGrow: 1,
+  },
+  pageContent: {
+    flexGrow: 1,
+    position: 'relative',
+    overflow: 'hidden',
   },
   sectionHeader: {
     paddingHorizontal: 20,

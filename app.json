@@ -31,7 +31,23 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permita que o PokeCollection use sua localização para mostrar sua posição no mapa."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permita que o PokeCollection use a câmera para registrar anexos.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true

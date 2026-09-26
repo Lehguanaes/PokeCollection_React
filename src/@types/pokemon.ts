@@ -10,4 +10,7 @@ export interface Pokemon {
     imagem: string;
     tipos: string[];
     poderes: Poder[];
+    altura?: number;
+    peso?: number;
+    habilidades?: string[];
 }

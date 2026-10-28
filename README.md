@@ -40,8 +40,10 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
   - Cards interativos;
   - Alertas personalizados;
   - Footer animado com Exibição dinâmica de Pokémons.
-- Seleção de Time;
-- Perfil... e muito mais!
+- Catálogo dos 151 Pokémon da primeira geração integrado à PokeAPI;
+- Pokédex e time armazenados localmente por usuário;
+- Captura de Pokémon por QR Code com registro de localização;
+- Mapa das capturas e perfil do treinador.
 
 ## 🛠️ Tecnologias Utilizadas
  - React Native;

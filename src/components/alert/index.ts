@@ -1,15 +1,9 @@
-import { Platform } from "react-native";
-import { AlertProps } from "./types";
-import AlertIOS from "./index.ios";
-import AlertAndroid from "./index.android";
-import AlertWeb from "./index.web";
-
-export {AlertImplementation as Alert};
-export * from "./types";
-
-const AlertImplementation = Platform.select({
-  ios: AlertIOS,
-  android: AlertAndroid,
-  web: AlertWeb,
-  default: AlertWeb
-}) as React.FC<AlertProps>;
+/*
+ * Define a fachada pública do componente de alerta.
+ * É importada pelas telas de login, Pokédex e equipe.
+ * Expõe a implementação resolvida por plataforma e seus tipos compartilhados.
+ */
+// Fachada pública: mantém imports estáveis enquanto o bundler escolhe Alert.web ou Alert.native.
+export { default as Alert } from './Alert';
+// O contrato é compartilhado para que consumidores não dependam da implementação da plataforma.
+export * from './types';

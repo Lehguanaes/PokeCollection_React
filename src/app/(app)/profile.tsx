@@ -1,131 +1,56 @@
-import React, { useEffect, useMemo, useState } from 'react';
+/*
+ * Esta tela reúne os dados e o progresso do treinador autenticado.
+ * Ela aparece na rota /profile dentro do layout principal.
+ * Atualiza a coleção, exibe a identidade da conta e encerra a sessão.
+ */
+// Hooks do React sustentam a atualização ao focar a tela e o layout responsivo.
+import React, { useCallback } from 'react';
 import {
-  Image,
-  Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Header } from '@/components/header';
+import { useFocusEffect, useRouter } from 'expo-router';
+
+// Componentes compartilhados mantêm a estrutura visual consistente com as demais telas.
+import { Screen } from '@/components/screen';
+import { Button } from '@/components/button';
 import { Footer } from '@/components/footer';
-import { Menu } from '@/components/menu';
-import { Loading } from '@/components/loading';
-import { Background } from '@/components/background';
-import { Alert } from '@/components/alert';
+import { Header } from '@/components/header';
+import { Heading } from '@/components/heading';
 import { Colors } from '@/constants/colors';
+// Os contextos fornecem a identidade autenticada e os dados atuais da coleção.
 import { useAuth } from '@/context/AuthContext';
-import {
-  getProfileStats,
-  ProfileStats,
-  updateProfileStats,
-} from '@/integration/collectionApi';
+import { useCollection } from '@/context/CollectionContext';
 
-const isWeb = Platform.OS === 'web';
-const XP_TOTAL = 100;
-
-export default function Perfil() {
-  const { user, userId } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [stats, setStats] = useState<ProfileStats | null>(null);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  const [alertData, setAlertData] = useState({
-    title: '',
-    message: '',
-    type: 'warning' as 'success' | 'error' | 'warning' | 'info',
-  });
+export default function Profile() {
+  const router = useRouter();
+  const { user, signOut } = useAuth();
+  const { captures, refresh } = useCollection();
   const { width } = useWindowDimensions();
-
+  // A largura define apenas ajustes de apresentação, sem criar versões diferentes da tela.
   const isMobile = width < 560;
 
-  useEffect(() => {
-    async function loadStats() {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await getProfileStats(userId);
-        setStats(response);
-      } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadStats();
-  }, [userId]);
-
-  const xpAtual = useMemo(() => {
-    if (!stats) return 0;
-    return Math.min((stats.vitorias * 20) % XP_TOTAL, XP_TOTAL);
-  }, [stats]);
-
-  async function performUpdateStats(type: 'win' | 'loss') {
-    if (!userId || !stats || saving) return;
-
-    const nextVitorias =
-      type === 'win' ? stats.vitorias + 1 : stats.vitorias;
-    const nextDerrotas =
-      type === 'loss' ? stats.derrotas + 1 : stats.derrotas;
-    const nextLevel = Math.max(1, Math.floor(nextVitorias / 5) + 1);
-
-    setSaving(true);
-
-    try {
-      const updated = await updateProfileStats(userId, {
-        level: nextLevel,
-        vitorias: nextVitorias,
-        derrotas: nextDerrotas,
+  // Reconsulta a coleção sempre que o perfil volta ao foco para exibir uma contagem atualizada.
+  useFocusEffect(
+    useCallback(() => {
+      void refresh().catch((error) => {
+        console.error('Erro ao atualizar perfil:', error);
       });
+    }, [refresh])
+  );
 
-      setStats(updated);
-    } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
-      setAlertData({
-        title: 'Erro ao atualizar',
-        message: 'Nao foi possivel atualizar seus status agora.',
-        type: 'error',
-      });
-      setAlertVisible(true);
-    } finally {
-      setSaving(false);
-    }
+  // Encerra a sessão antes de voltar à entrada para não deixar uma rota privada ativa.
+  async function handleDisconnect() {
+    await signOut();
+    router.replace('/');
   }
-
-  function handleUpdateStats(type: 'win' | 'loss') {
-    setAlertData({
-      title: type === 'win' ? 'Registrar vitoria' : 'Registrar derrota',
-      message:
-        type === 'win'
-          ? 'Deseja mesmo registrar uma nova vitoria no seu perfil?'
-          : 'Deseja mesmo registrar uma nova derrota no seu perfil?',
-      type: 'warning',
-    });
-    setConfirmAction(() => () => performUpdateStats(type));
-    setAlertVisible(true);
-  }
-
-  if (loading) return <Loading />;
-
-  const displayName = stats?.username ?? user ?? 'Treinador';
-  const level = stats?.level ?? 1;
-  const vitorias = stats?.vitorias ?? 0;
-  const derrotas = stats?.derrotas ?? 0;
-  const batalhas = vitorias + derrotas;
-  const aproveitamento =
-    batalhas > 0 ? `${Math.round((vitorias / batalhas) * 100)}%` : '0%';
 
   return (
-    <View style={styles.wrapper}>
-      <Background />
-      {!isMobile && <Menu />}
+    <Screen>
+      {/* A rolagem reúne cabeçalho, cartão de perfil e rodapé em uma página responsiva. */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -133,429 +58,157 @@ export default function Perfil() {
       >
         <Header />
 
-        <Text style={[styles.title, isMobile && styles.titleMobile]}>
-          Perfil do {displayName}
-        </Text>
-        <View style={[styles.line, isMobile && styles.lineMobile]} />
-        <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
-          Status sincronizados com a colecao
-        </Text>
+        <Heading
+          title="Perfil"
+          subtitle="Informações da sua conta"
+          style={styles.heading}
+        />
 
+        {/* O cartão central resume identidade, usuário e progresso da coleção. */}
         <View style={styles.content}>
-          <View
-            style={[
-              styles.card,
-              { flexDirection: isMobile ? 'column' : 'row' },
-            ]}
-          >
-            <View style={[styles.leftSection, isMobile && styles.leftMobile]}>
-              <View style={styles.profileContent}>
-                <View style={styles.glow} />
-                <View style={styles.avatarWrapper}>
-                  <Image
-                    source={require('../../../assets/images/icon.png')}
-                    style={styles.avatar}
-                  />
-                </View>
-                <Text style={[styles.name, isMobile && styles.nameMobile]}>
-                  {displayName}
-                </Text>
-                <Text style={styles.role}>Cacador de Pokemons</Text>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Nivel {level}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.rightSection, isMobile && styles.rightMobile]}>
-              <View style={styles.statHeader}>
-                <Text style={[styles.statTitle, isMobile && styles.statTitleMobile]}>
-                  Experiencia
-                </Text>
-                <Text style={[styles.statValue, isMobile && styles.statValueMobile]}>
-                  {xpAtual}/{XP_TOTAL}
-                </Text>
-              </View>
-
-              <View style={styles.xpBarTrack}>
-                <View
-                  style={[
-                    styles.xpBarFill,
-                    { width: `${(xpAtual / XP_TOTAL) * 100}%` },
-                  ]}
-                />
-              </View>
-
-              <Text style={[styles.xpText, isMobile && styles.xpTextMobile]}>
-                Faltam {XP_TOTAL - xpAtual} XP para o proximo nivel
+          <View style={[styles.card, isMobile && styles.cardMobile]}>
+            <View style={styles.identityMark}>
+              <Text style={styles.identityInitial}>
+                {(user?.trim().charAt(0) || 'T').toUpperCase()}
               </Text>
+            </View>
 
-              <View style={styles.statDivider} />
+            <Text style={[styles.name, isMobile && styles.nameMobile]}>
+              {user || 'Treinador'}
+            </Text>
 
-              <View style={[styles.grid, isMobile && styles.gridMobile]}>
-                {[
-                  { value: vitorias, label: 'Vitorias' },
-                  { value: derrotas, label: 'Derrotas' },
-                  { value: level, label: 'Nivel' },
-                  { value: aproveitamento, label: 'Aproveitamento' },
-                ].map((item) => (
-                  <Pressable
-                    key={item.label}
-                    style={(state: any) => [
-                      styles.gridCard,
-                      Boolean(state.hovered) && isWeb && styles.gridCardHover,
-                      isMobile && styles.gridCardMobile,
-                    ]}
-                  >
-                    <Text style={[styles.gridNumber, isMobile && styles.gridNumberMobile]}>
-                      {item.value}
-                    </Text>
-                    <Text style={[styles.gridLabel, isMobile && styles.gridLabelMobile]}>
-                      {item.label}
-                    </Text>
-                  </Pressable>
-                ))}
+            <View style={styles.details}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Nome de usuário</Text>
+                <Text style={styles.detailValue}>{user || 'Não informado'}</Text>
               </View>
-
-              <View style={styles.actions}>
-                <Pressable
-                  style={[styles.actionButton, saving && styles.actionDisabled]}
-                  onPress={() => handleUpdateStats('win')}
-                  disabled={saving}
-                >
-                  <Text style={styles.actionText}>Registrar vitoria</Text>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.actionButtonAlt, saving && styles.actionDisabled]}
-                  onPress={() => handleUpdateStats('loss')}
-                  disabled={saving}
-                >
-                  <Text style={styles.actionTextAlt}>Registrar derrota</Text>
-                </Pressable>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Pokémon capturados</Text>
+                <Text style={styles.captureCount}>{captures.length}/151</Text>
               </View>
             </View>
+
+            {/* A ação destrutiva fica separada dos dados para deixar clara a saída da conta. */}
+            <Button
+              title="Desconectar"
+              variant="danger"
+              style={styles.disconnectButton}
+              onPress={() => void handleDisconnect()}
+              accessibilityLabel="Desconectar da conta"
+            />
           </View>
         </View>
 
         <Footer />
       </ScrollView>
-
-      <Alert
-        title={alertData.title}
-        message={alertData.message}
-        type={alertData.type}
-        visible={alertVisible}
-        onClose={() => {
-          setAlertVisible(false);
-          setConfirmAction(null);
-        }}
-        actions={
-          confirmAction
-            ? [
-                {
-                  label: 'Cancelar',
-                  variant: 'secondary',
-                  onPress: () => {
-                    setAlertVisible(false);
-                    setConfirmAction(null);
-                  },
-                },
-                {
-                  label: 'Confirmar',
-                  variant: 'primary',
-                  onPress: () => {
-                    const action = confirmAction;
-                    setAlertVisible(false);
-                    setConfirmAction(null);
-                    action?.();
-                  },
-                },
-              ]
-            : undefined
-        }
-      />
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: { flex: 1, backgroundColor: Colors.background },
-  scroll: { flex: 1 },
-  scrollContent: { flexGrow: 1 },
-
+  // Estrutura da página rolável e alinhamento do conteúdo principal.
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 0,
+  },
+  heading: {
+    marginTop: 10,
+  },
   content: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    marginTop: 30,
-    marginBottom: 40,
+    paddingVertical: 38,
   },
-
-  title: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: Colors.title,
-    textAlign: 'center',
-    marginTop: 28,
-  },
-  titleMobile: {
-    fontSize: 24,
-    marginTop: 18,
-  },
-
-  subtitle: {
-    fontSize: 18,
-    color: Colors.subtitle,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  subtitleMobile: {
-    fontSize: 14,
-  },
-
-  line: {
-    width: 360,
-    height: 5,
-    backgroundColor: Colors.text,
-    alignSelf: 'center',
-    marginVertical: 14,
-    borderRadius: 20,
-  },
-  lineMobile: {
-    width: 200,
-    marginVertical: 10,
-  },
-
+  // Cartão de identidade e sua adaptação para telas estreitas.
   card: {
     width: '100%',
-    maxWidth: 1000,
-    backgroundColor: Colors.white,
-    borderRadius: 40,
-    padding: 30,
+    maxWidth: 680,
+    borderRadius: 36,
     borderWidth: 2,
     borderColor: Colors.inputBorder,
-    gap: 40,
-    overflow: 'hidden',
-  },
-
-  leftSection: {
-    width: isWeb ? 280 : '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  leftMobile: {
-    width: '100%',
-    marginTop: 15,
-  },
-
-  profileContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  glow: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 999,
-    backgroundColor: Colors.secondary,
-    opacity: 0.18,
-    top: -20,
-  },
-
-  avatarWrapper: {
-    width: 200,
-    height: 200,
-    borderRadius: 999,
     backgroundColor: Colors.white,
-    borderWidth: 4,
-    borderColor: Colors.details,
-    justifyContent: 'center',
+    padding: 38,
     alignItems: 'center',
   },
-
-  avatar: { width: 160, height: 160 },
-
-  name: {
-    fontSize: 34,
+  cardMobile: {
+    borderRadius: 26,
+    paddingHorizontal: 20,
+    paddingVertical: 28,
+  },
+  // Marca visual e nome usados para reconhecer rapidamente o treinador.
+  identityMark: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    backgroundColor: Colors.primary,
+    borderWidth: 5,
+    borderColor: Colors.details,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  identityInitial: {
+    color: Colors.white,
+    fontSize: 46,
     fontWeight: '900',
+  },
+  name: {
     color: Colors.title,
-    marginTop: 22,
+    fontSize: 30,
+    fontWeight: '900',
     textAlign: 'center',
+    marginTop: 18,
   },
   nameMobile: {
     fontSize: 24,
-    marginTop: 14,
   },
-
-  role: {
-    fontSize: 14,
-    color: Colors.subtitle,
-    fontWeight: '700',
-    marginTop: 8,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-
-  badge: {
-    marginTop: 18,
-    backgroundColor: Colors.details,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 999,
-  },
-
-  badgeText: {
-    color: Colors.gray[800],
-    fontWeight: '800',
-    fontSize: 14,
-  },
-
-  rightSection: { flex: 1 },
-  rightMobile: {
-    borderLeftWidth: 0,
-    paddingLeft: 0,
-    paddingTop: 10,
-  },
-
-  statHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  statTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: Colors.title,
-  },
-  statTitleMobile: {
-    fontSize: 16,
-  },
-
-  statValue: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: Colors.subtitle,
-  },
-  statValueMobile: {
-    fontSize: 14,
-  },
-
-  xpBarTrack: {
-    height: 16,
-    backgroundColor: Colors.inputBorder,
-    borderRadius: 999,
-    overflow: 'hidden',
-    marginTop: 14,
-  },
-
-  xpBarFill: {
-    height: '100%',
-    backgroundColor: Colors.details,
-  },
-
-  xpText: {
-    fontSize: 14,
-    color: Colors.subtitle,
-    fontWeight: '600',
-    marginTop: 10,
-  },
-  xpTextMobile: {
-    fontSize: 12,
-  },
-
-  statDivider: {
-    height: 2,
-    backgroundColor: Colors.inputBorder,
-    marginVertical: 20,
-  },
-
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 18,
-  },
-  gridMobile: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-
-  gridCard: {
-    width: isWeb ? '47%' : '100%',
-    backgroundColor: Colors.white,
-    borderRadius: 24,
-    paddingVertical: 28,
-    alignItems: 'center',
+  // Quadro de dados, linhas e tipografia que organizam as informações da conta.
+  details: {
+    width: '100%',
+    marginTop: 30,
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: Colors.inputBorder,
+    backgroundColor: Colors.inputBackground,
+    paddingHorizontal: 20,
   },
-  gridCardMobile: {
-    width: '100%',
-  },
-  gridCardHover: {
-    borderColor: '#FFD54A',
-    shadowColor: '#FFD54A',
-    shadowOpacity: 0.25,
-  },
-
-  gridNumber: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: Colors.title,
-  },
-  gridNumberMobile: {
-    fontSize: 22,
-  },
-
-  gridLabel: {
-    marginTop: 8,
-    fontSize: 14,
-    color: Colors.subtitle,
-    fontWeight: '700',
-  },
-  gridLabelMobile: {
-    fontSize: 12,
-  },
-
-  actions: {
+  detailRow: {
+    minHeight: 74,
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 22,
-  },
-
-  actionButton: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    borderRadius: 24,
-    paddingVertical: 14,
+    flexWrap: 'wrap',
+    gap: 8,
     alignItems: 'center',
-  },
-
-  actionButtonAlt: {
-    flex: 1,
-    backgroundColor: Colors.white,
-    borderRadius: 24,
+    justifyContent: 'space-between',
     paddingVertical: 14,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.primary,
   },
-
-  actionDisabled: {
-    opacity: 0.55,
+  detailLabel: {
+    color: Colors.subtitle,
+    fontSize: 14,
+    fontWeight: '800',
   },
-
-  actionText: {
-    color: Colors.white,
+  detailValue: {
+    maxWidth: '100%',
+    color: Colors.text,
+    fontSize: 15,
+    fontWeight: '900',
+    textAlign: 'right',
+  },
+  captureCount: {
+    color: Colors.title,
+    fontSize: 21,
     fontWeight: '900',
   },
-
-  actionTextAlt: {
-    color: Colors.primary,
-    fontWeight: '900',
+  divider: {
+    height: 1,
+    backgroundColor: Colors.inputBorder,
+  },
+  // Espaçamento isola a ação de desconexão dos dados informativos.
+  disconnectButton: {
+    marginTop: 26,
   },
 });

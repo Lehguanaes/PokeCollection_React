@@ -5,19 +5,18 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pokeCollection",
+    "scheme": "pokecollection",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Permita que o PokeCollection use a câmera para capturar Pokémon por QR Code.",
+        "NSLocationWhenInUseUsageDescription": "Permita que o PokeCollection registre onde seus Pokémon foram capturados."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -35,18 +34,30 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Permita que o PokeCollection use sua localização para mostrar sua posição no mapa."
+          "locationWhenInUsePermission": "Permita que o PokeCollection registre onde seus Pokémon foram capturados e mostre essas capturas no mapa."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Permita que o PokeCollection use a câmera para registrar anexos.",
+          "cameraPermission": "Permita que o PokeCollection use a câmera para capturar Pokémon por QR Code.",
           "recordAudioAndroid": false,
-          "barcodeScannerEnabled": false
+          "barcodeScannerEnabled": true
         }
       ],
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#ffffff"
+          }
+        }
+      ],
       "expo-status-bar"
     ],
     "experiments": {

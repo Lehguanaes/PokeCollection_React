@@ -239,6 +239,8 @@ export default function App() {
         label="SENHA"
         placeholder="Informe sua senha"
         secureTextEntry
+        autoCapitalize="none"
+        autoCorrect={false}
         value={senha}
         onChangeText={setSenha}
         onFocus={onFocus}

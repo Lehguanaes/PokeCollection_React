@@ -31,6 +31,19 @@ export const styles = StyleSheet.create({
     borderColor: Colors.inputBorder,
   },
 
+  passwordInput: {
+    paddingRight: 50,
+  },
+  visibilityButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   // A entrada define o respiro e a tipografia internos. Na web, o contorno padrão
   // do navegador é removido para não se somar à borda desenhada pelo wrapper.
   input: {
@@ -41,7 +54,7 @@ export const styles = StyleSheet.create({
 
     borderWidth: 0,
     ...(Platform.OS === 'web' && {
-      outlineStyle: 'none',
+      outlineWidth: 0,
     }),
   },
 });

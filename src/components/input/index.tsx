@@ -3,8 +3,10 @@
  * É usado principalmente nas telas do fluxo de autenticação.
  * Combina rótulo fixo, entrada nativa e contorno animável.
  */
-import React from "react";
-import { View, Text, TextInput, TextInputProps, Animated } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TextInputProps, Animated, Pressable } from "react-native";
+import { Eye, EyeOff } from 'lucide-react-native';
+import { Colors } from '@/constants/colors';
 import { styles } from "./styles";
 
 /**
@@ -19,7 +21,8 @@ type Props = TextInputProps & {
 };
 
 /** Agrupa rótulo e entrada em uma unidade visual reutilizável de formulário. */
-export function Input({ label, animatedStyle, ...rest }: Props) {
+export function Input({ label, animatedStyle, secureTextEntry, ...rest }: Props) {
+  const [passwordVisible, setPasswordVisible] = useState(false);
   return (
     <View style={styles.container}>
       {/* O rótulo permanece visível mesmo quando há placeholder ou valor digitado. */}
@@ -28,7 +31,23 @@ export function Input({ label, animatedStyle, ...rest }: Props) {
       {/* A animação fica no wrapper para incluir fundo e borda; as propriedades
           restantes são encaminhadas ao TextInput sem limitar sua API nativa. */}
       <Animated.View style={[styles.inputWrapper, animatedStyle]}>
-        <TextInput style={styles.input as any} {...rest} />
+        <TextInput
+          {...rest}
+          style={[styles.input, secureTextEntry && styles.passwordInput, rest.style]}
+          secureTextEntry={Boolean(secureTextEntry) && !passwordVisible}
+        />
+        {secureTextEntry && (
+          <Pressable
+            style={styles.visibilityButton}
+            onPress={() => setPasswordVisible((visible) => !visible)}
+            accessibilityRole="button"
+            accessibilityLabel={passwordVisible ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            {passwordVisible
+              ? <EyeOff size={20} color={Colors.label} />
+              : <Eye size={20} color={Colors.label} />}
+          </Pressable>
+        )}
       </Animated.View>
     </View>
   );

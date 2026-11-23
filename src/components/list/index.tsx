@@ -159,9 +159,9 @@ export function List({
       maxToRenderPerBatch={Platform.OS === 'android' ? 4 : 8}
       updateCellsBatchingPeriod={Platform.OS === 'android' ? 60 : 30}
       windowSize={Platform.OS === 'android' ? 5 : 10}
-      ListHeaderComponent={ListHeaderComponent}
+      ListHeaderComponent={ListHeaderComponent ?? undefined}
       ListHeaderComponentStyle={styles.fullWidthSection}
-      ListFooterComponent={ListFooterComponent}
+      ListFooterComponent={ListFooterComponent ?? undefined}
       ListFooterComponentStyle={styles.footerSection}
     />
   );

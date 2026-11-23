@@ -141,7 +141,7 @@ os agendamentos; a preferência é retomada no próximo login. São notificaçõ
 sem servidor de push, organizadas em `src/notifications`.
 
 Para apresentar no Android:
-1. Execute `npm install` e `npx expo start --android` com um Expo Go compatível com o SDK 57.
+1. Execute `npm install` e `npx expo start --tunnel --clear` com um Expo Go compatível com o SDK 58.
 2. Entre na conta, abra o perfil e ative **Lembrete de captura**.
 3. Autorize as notificações e vá para a tela inicial do celular, sem forçar a parada do app.
 4. Ao receber o aviso, toque para abrir a Pokédex. Se não houver sessão, faça login.

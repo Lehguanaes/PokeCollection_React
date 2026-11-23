@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Switch, Text, View } from 'react-native';
-import { useRootNavigationState, useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { getReminderEnabled, setReminderEnabled } from '@/database/sqlite';
 
 const REMINDER_SECONDS = 60;
-const CHANNEL = 'capture-reminders';
 const REMINDER_ID = 'daily-capture-reminder';
 
 Notifications.setNotificationHandler({
@@ -23,11 +21,6 @@ let currentUserId: string | null = null;
 let reminderEnabled = false;
 
 async function requestPermission() {
-  await Notifications.setNotificationChannelAsync(CHANNEL, {
-    name: 'Lembrete de captura',
-    importance: Notifications.AndroidImportance.HIGH,
-    sound: 'default',
-  });
   const permission = await Notifications.requestPermissionsAsync();
   if (!permission.granted) throw new Error('Permita as notificações nas configurações do Android.');
 }
@@ -48,7 +41,6 @@ async function applyReminder(enabled: boolean) {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: REMINDER_SECONDS,
       repeats: true,
-      channelId: CHANNEL,
     },
   });
   // Se foi desligado enquanto o Android agendava, cancele o aviso.
@@ -69,10 +61,6 @@ async function saveReminder(userId: string, enabled: boolean, previous: boolean)
 
 export function NotificationManager() {
   const { userId } = useAuth();
-  const router = useRouter();
-  const navigation = useRootNavigationState();
-  const response = Notifications.useLastNotificationResponse();
-  const handled = useRef('');
   const previousUserId = useRef(userId);
   currentUserId = userId;
 
@@ -91,15 +79,6 @@ export function NotificationManager() {
     return () => { active = false; };
   }, [userId]);
 
-  useEffect(function openNotification() {
-    if (!navigation?.key || !response) return;
-    const request = response.notification.request;
-    const id = `${request.identifier}:${response.notification.date}`;
-    if (request.content.data?.screen !== 'pokedex' || handled.current === id) return;
-    handled.current = id;
-    router.replace(userId ? '/pokedex' : '/');
-    void Notifications.clearLastNotificationResponseAsync().catch(console.error);
-  }, [navigation?.key, response, router, userId]);
 
   return null;
 }

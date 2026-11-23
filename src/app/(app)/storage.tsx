@@ -1,11 +1,12 @@
 /*
- * Tela de inspeção do AsyncStorage para demonstração em desenvolvimento.
+ * Tela de inspeção do armazenamento local para demonstração em desenvolvimento.
  * Mostra no próprio Android os dados persistidos localmente pelo aplicativo.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { readStoredEntries } from '@/database/sqlite';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { Database, RefreshCw } from 'lucide-react-native';
+import { Redirect } from 'expo-router';
 
 import { Button } from '@/components/button';
 import { Header } from '@/components/header';
@@ -25,7 +27,8 @@ type StorageEntry = {
   value: string | null;
 };
 
-const COLLECTION_KEY_PREFIX = '@poke-collection/collection/';
+const COLLECTION_KEY_PREFIX = 'collections/';
+const STORAGE_NAME = 'SQLite';
 
 function formatStorageValue(value: string | null) {
   if (value === null) return 'null';
@@ -37,7 +40,12 @@ function formatStorageValue(value: string | null) {
   }
 }
 
-export default function StorageInspector() {
+export default function StoragePage() {
+  if (Platform.OS !== 'android') return <Redirect href="/pokedex" />;
+  return <StorageInspector />;
+}
+
+function StorageInspector() {
   const [entries, setEntries] = useState<StorageEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
@@ -48,10 +56,8 @@ export default function StorageInspector() {
     setError(null);
 
     try {
-      const keys = await AsyncStorage.getAllKeys();
-      const values = await AsyncStorage.multiGet(keys);
+      const values = await readStoredEntries();
       const nextEntries = values
-        .map(([key, value]) => ({ key, value }))
         .sort((first, second) => {
           const firstIsCollection = first.key.startsWith(COLLECTION_KEY_PREFIX);
           const secondIsCollection = second.key.startsWith(COLLECTION_KEY_PREFIX);
@@ -72,7 +78,7 @@ export default function StorageInspector() {
         )
       );
     } catch {
-      setError('Não foi possível ler o AsyncStorage deste aparelho.');
+      setError(`Não foi possível ler o ${STORAGE_NAME} deste aparelho.`);
     } finally {
       setLoading(false);
     }
@@ -97,7 +103,7 @@ export default function StorageInspector() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Heading
-          title="AsyncStorage"
+          title={STORAGE_NAME}
           subtitle="Dados persistidos localmente neste aparelho"
           icon={Database}
           variant="compact"
@@ -121,7 +127,7 @@ export default function StorageInspector() {
         {loading ? (
           <View style={styles.stateCard}>
             <ActivityIndicator color={Colors.primary} />
-            <Text style={styles.stateText}>Lendo AsyncStorage...</Text>
+            <Text style={styles.stateText}>Lendo {STORAGE_NAME}...</Text>
           </View>
         ) : error ? (
           <View style={styles.stateCard}>
@@ -181,7 +187,7 @@ export default function StorageInspector() {
         ) : (
           <View style={styles.stateCard}>
             <Text style={styles.stateText}>
-              Nenhuma chave encontrada no AsyncStorage deste aparelho.
+              Nenhum registro encontrado no {STORAGE_NAME} deste aparelho.
             </Text>
           </View>
         )}

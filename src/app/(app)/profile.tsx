@@ -6,6 +6,7 @@
 // Hooks do React sustentam a atualização ao focar a tela e o layout responsivo.
 import React, { useCallback } from 'react';
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -24,6 +25,10 @@ import { Colors } from '@/constants/colors';
 // Os contextos fornecem a identidade autenticada e os dados atuais da coleção.
 import { useAuth } from '@/context/AuthContext';
 import { useCollection } from '@/context/CollectionContext';
+
+const NotificationSettings = Platform.OS === 'android'
+  ? require('@/notifications').NotificationSettings
+  : null;
 
 export default function Profile() {
   const router = useRouter();
@@ -88,6 +93,8 @@ export default function Profile() {
                 <Text style={styles.captureCount}>{captures.length}/151</Text>
               </View>
             </View>
+
+            {NotificationSettings && <NotificationSettings />}
 
             {/* A ação destrutiva fica separada dos dados para deixar clara a saída da conta. */}
             <Button

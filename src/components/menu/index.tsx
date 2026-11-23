@@ -127,13 +127,12 @@ export function Menu() {
   const availableMenuItems = isAuthenticated
     ? MENU_ITEMS
     : [];
-  // Captura existe somente no Android. As demais opções permanecem idênticas
-  // entre plataformas.
+  // Captura e inspeção do SQLite estão disponíveis somente no Android.
   const visibleMenuItems =
     Platform.OS === 'android'
       ? availableMenuItems
       : availableMenuItems.filter(
-          (item) => item.type !== 'route' || item.route !== '/camera'
+          (item) => item.type !== 'route' || (item.route !== '/camera' && item.route !== '/storage')
         );
 
   // `open` controla a presença do dropdown na árvore e o estado lógico do botão.

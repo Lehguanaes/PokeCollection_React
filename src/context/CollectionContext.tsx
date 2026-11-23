@@ -29,7 +29,7 @@ import {
   getCollection,
   removeFromTeam as removePokemonFromTeam,
   saveCapturedPokemon,
-} from '@/integration/capturedPokemonStorage';
+} from '@/database/capturedPokemonStorage';
 
 // Estado neutro compartilhado enquanto não há usuário autenticado ou nenhum dado
 // foi carregado. Como o provider nunca muta este objeto, ele pode ser reutilizado
@@ -50,14 +50,9 @@ function cloneCollection(collection: PokemonCollection): PokemonCollection {
   };
 }
 
-function collectionForPlatform(collection: PokemonCollection): PokemonCollection {
-  if (!USE_DEMO_COLLECTION || collection.captures.length) return collection;
-  return cloneCollection(DEMO_COLLECTION);
-}
-
 // Contrato entregue às telas: oferece o documento completo, recortes convenientes,
 // estado de carregamento, operações persistentes e consultas síncronas. Assim os
-// consumidores não precisam conhecer AsyncStorage nem reconstruir o time por ids.
+// consumidores não precisam conhecer a persistência nem reconstruir o time por ids.
 type CollectionContextData = {
   collection: PokemonCollection;
   captures: CapturedPokemon[];
@@ -79,7 +74,7 @@ type CollectionContextData = {
 // e permite ao hook emitir um erro claro quando a árvore foi configurada incorretamente.
 const CollectionContext = createContext<CollectionContextData | null>(null);
 
-// Faz a ponte reativa entre autenticação, AsyncStorage e interface. O `userId` do
+// Faz a ponte reativa entre autenticação, persistência e interface. O `userId` do
 // AuthContext seleciona o documento; leituras alimentam `collection`; mutações são
 // delegadas à integração e seguidas de nova leitura; por fim, valores derivados e
 // ações estáveis são distribuídos para todas as telas descendentes.
@@ -109,7 +104,9 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const nextCollection = collectionForPlatform(await getCollection(targetUserId));
+    const nextCollection = USE_DEMO_COLLECTION
+      ? cloneCollection(DEMO_COLLECTION)
+      : await getCollection(targetUserId);
     if (activeUserId.current === targetUserId) setCollection(nextCollection);
   }, []);
 
@@ -273,7 +270,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
   );
   // O storage conserva somente ids para não duplicar dados. Aqui cada vaga é
   // substituída pela captura correspondente na mesma ordem; referências órfãs são
-  // ignoradas defensivamente, embora o normalizador normalmente já as remova.
+  // ignoradas para que o time contenha somente capturas existentes.
   const team = collection.teamIds.flatMap((id) => {
     const pokemon = capturesById.get(id);
     return pokemon ? [pokemon] : [];

@@ -29,6 +29,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
+      "expo-sqlite",
       "expo-font",
       "expo-web-browser",
       [

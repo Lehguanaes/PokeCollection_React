@@ -31,7 +31,7 @@ import { Heading } from '@/components/heading';
 import { StateCard } from '@/components/stateCard';
 import { Colors } from '@/constants/colors';
 import { useCollection } from '@/context/CollectionContext';
-import { formatCaptureDate } from '@/utils/formatCaptureDate';
+import { formatCaptureDate } from '@/formatters/formatCaptureDate';
 
 function MapWeb() {
   const { width } = useWindowDimensions();

@@ -3,8 +3,7 @@
  * Ela aparece na rota autenticada /pokemon do layout principal.
  * Busca, filtra e pagina Pokémon, exibindo detalhes e status de captura.
  */
-// Hooks controlam carregamentos, filtros derivados e adaptação da grade à tela.
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -28,16 +27,8 @@ import { Colors } from '@/constants/colors';
 import { TYPE_MAP } from '@/constants/pokemon';
 // A coleção identifica quais itens do catálogo já pertencem ao usuário.
 import { useCollection } from '@/context/CollectionContext';
-// A integração separa o índice leve, o filtro por tipo e os detalhes completos da API.
-import {
-  getPokemonCatalog,
-  getPokemonIdsByType,
-  getPokemonsByIds,
-  PokemonCatalogEntry,
-} from '@/integration/pokemonIntegration';
+import { usePokemonCatalog } from '@/hooks/usePokemonCatalog';
 
-// O tamanho fixo limita chamadas de detalhes e mantém a grade previsível por página.
-const PAGE_SIZE = 12;
 const GRID_CARD_WIDTH = 320;
 const GRID_GAP = 16;
 // A lista canônica permite oferecer todos os filtros com ordem estável e nomes traduzíveis.
@@ -69,152 +60,24 @@ export default function PokemonCatalog() {
   const columns = width >= 1120 ? 3 : width >= 760 ? 2 : 1;
   const gridContentWidth = columns * GRID_CARD_WIDTH + (columns - 1) * GRID_GAP;
 
-  // Primeiro grupo: índice geral e seu ciclo independente de carregamento/repetição.
-  const [catalog, setCatalog] = useState<PokemonCatalogEntry[]>([]);
-  const [catalogLoading, setCatalogLoading] = useState(true);
-  const [catalogError, setCatalogError] = useState(false);
-  const [catalogRetry, setCatalogRetry] = useState(0);
-
-  // Segundo grupo: escolhas de filtro e ids retornados pela consulta do tipo selecionado.
-  const [search, setSearch] = useState('');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [typeIds, setTypeIds] = useState<Set<number> | null>(null);
-  const [typeLoading, setTypeLoading] = useState(false);
-  const [typeError, setTypeError] = useState(false);
-  const [typeRetry, setTypeRetry] = useState(0);
-
-  // Terceiro grupo: página atual, detalhes exibidos e Pokémon aberto no modal.
-  const [page, setPage] = useState(1);
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [pageLoading, setPageLoading] = useState(false);
-  const [pageError, setPageError] = useState(false);
-  const [pageRetry, setPageRetry] = useState(0);
+  const {
+    pokemons,
+    search,
+    selectedType,
+    page,
+    pageCount,
+    totalResults,
+    firstResult,
+    lastResult,
+    loading,
+    error,
+    empty,
+    changeSearch,
+    changeType,
+    setPage,
+    retry,
+  } = usePokemonCatalog();
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
-
-  // Carrega o índice uma vez e novamente sob pedido; a flag evita atualizar uma tela desmontada.
-  useEffect(() => {
-    let active = true;
-    setCatalogLoading(true);
-    setCatalogError(false);
-
-    void getPokemonCatalog()
-      .then((entries) => {
-        if (active) setCatalog(entries);
-      })
-      .catch(() => {
-        if (active) setCatalogError(true);
-      })
-      .finally(() => {
-        if (active) setCatalogLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [catalogRetry]);
-
-  // Busca ids do tipo apenas quando há filtro, pois "todos" já usa diretamente o catálogo.
-  useEffect(() => {
-    let active = true;
-
-    if (selectedType === 'all') {
-      setTypeIds(null);
-      setTypeLoading(false);
-      setTypeError(false);
-      return () => {
-        active = false;
-      };
-    }
-
-    setTypeIds(null);
-    setTypeLoading(true);
-    setTypeError(false);
-
-    void getPokemonIdsByType(selectedType)
-      .then((ids) => {
-        if (active) setTypeIds(ids);
-      })
-      .catch(() => {
-        if (active) setTypeError(true);
-      })
-      .finally(() => {
-        if (active) setTypeLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [selectedType, typeRetry]);
-
-  // Combina busca textual/numérica e tipo antes de paginar, garantindo contagens corretas.
-  const filteredCatalog = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    const numericQuery = /^\d+$/.test(query) ? Number(query) : null;
-
-    return catalog.filter((entry) => {
-      const matchesType = selectedType === 'all' || typeIds?.has(entry.id);
-      const matchesSearch = !query
-        ? true
-        : numericQuery !== null
-          ? entry.id === numericQuery
-          : entry.name.toLowerCase().includes(query);
-      return matchesType && matchesSearch;
-    });
-  }, [catalog, search, selectedType, typeIds]);
-
-  // Estes valores derivados recortam a página e criam uma chave estável para buscar detalhes.
-  const pageCount = Math.ceil(filteredCatalog.length / PAGE_SIZE);
-  const pageEntries = useMemo(
-    () => filteredCatalog.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filteredCatalog, page]
-  );
-  const pageIds = useMemo(() => pageEntries.map((entry) => entry.id), [pageEntries]);
-  const pageIdsKey = pageIds.join(',');
-
-  // Só busca objetos completos para os ids visíveis, reduzindo tráfego e tempo de renderização.
-  useEffect(() => {
-    let active = true;
-
-    // Sem uma página válida, limpa resultados antigos para não exibir dados incompatíveis com o filtro.
-    if (!pageIds.length || catalogLoading || typeLoading || catalogError || typeError) {
-      setPokemons([]);
-      setPageLoading(false);
-      setPageError(false);
-      return () => {
-        active = false;
-      };
-    }
-
-    setPokemons([]);
-    setPageLoading(true);
-    setPageError(false);
-
-    void getPokemonsByIds(pageIds)
-      .then((details) => {
-        if (active) setPokemons(details);
-      })
-      .catch(() => {
-        if (active) setPageError(true);
-      })
-      .finally(() => {
-        if (active) setPageLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [pageIdsKey, pageRetry, catalogLoading, typeLoading, catalogError, typeError]);
-
-  // Alterar qualquer filtro volta à primeira página para impedir uma página fora do novo resultado.
-  const changeSearch = (value: string) => {
-    setSearch(value);
-    setPage(1);
-  };
-
-  const changeType = (type: string) => {
-    setSelectedType(type);
-    setPage(1);
-  };
 
   // O selo acrescenta contexto de coleção sem alterar o componente genérico de cartão.
   const renderPokemonCard = (pokemon: Pokemon) => {
@@ -233,20 +96,6 @@ export default function PokemonCatalog() {
         />
       </View>
     );
-  };
-
-  // Estados derivados consolidam as três etapas assíncronas para simplificar as decisões do JSX.
-  const waiting = catalogLoading || typeLoading || pageLoading;
-  const requestFailed = catalogError || typeError || pageError;
-  const empty = !waiting && !requestFailed && filteredCatalog.length === 0;
-  const firstResult = filteredCatalog.length ? (page - 1) * PAGE_SIZE + 1 : 0;
-  const lastResult = Math.min(page * PAGE_SIZE, filteredCatalog.length);
-
-  // Repete somente a etapa que falhou, evitando refazer chamadas anteriores bem-sucedidas.
-  const retry = () => {
-    if (catalogError) setCatalogRetry((value) => value + 1);
-    else if (typeError) setTypeRetry((value) => value + 1);
-    else setPageRetry((value) => value + 1);
   };
 
   return (
@@ -308,22 +157,22 @@ export default function PokemonCatalog() {
             </View>
 
             {/* O resumo só aparece quando há um conjunto confiável de resultados para contar. */}
-            {!catalogLoading && !typeLoading && !requestFailed && !empty ? (
+            {!loading && !error && !empty ? (
               <Text style={styles.resultSummary}>
-                Exibindo {firstResult}-{lastResult} de {filteredCatalog.length}
+                Exibindo {firstResult}-{lastResult} de {totalResults}
               </Text>
             ) : null}
 
             {/* Carregamento, falha e vazio são estados exclusivos que orientam a próxima ação. */}
-            {waiting ? (
+            {loading ? (
               <StateCard
-                message={pageLoading ? 'Carregando esta página...' : 'Preparando o catálogo...'}
+                message="Carregando Pokémon..."
                 loading
                 style={styles.stateCard}
               />
             ) : null}
 
-            {requestFailed ? (
+            {error ? (
               <StateCard
                 title="Não foi possível carregar o catálogo"
                 message="Confira sua conexão e tente novamente."
@@ -345,7 +194,7 @@ export default function PokemonCatalog() {
         ListFooterComponent={
           <>
             {/* A paginação só é necessária quando existe mais de uma página utilizável. */}
-            {pageCount > 1 && !waiting && !requestFailed ? (
+            {pageCount > 1 && !loading && !error ? (
               <View style={styles.pagination}>
                 <Pressable
                   onPress={() => setPage((value) => Math.max(1, value - 1))}

@@ -127,6 +127,29 @@ A aplicação foi criada em dupla como atividade prática de estudos, tendo como
   
 </h3>
 
+## Android: SQLite e notificações
+
+A coleção e o time são persistidos por usuário em `pokecollection.db`, na tabela
+`collections`. Cada linha guarda o documento JSON da coleção, mantendo as regras
+de captura e equipe. A tabela `notification_preferences` guarda a preferência do lembrete.
+O banco e as tabelas são criados ao acessar o SQLite pela primeira vez.
+A persistência está em `src/database`, sem migração de dados do AsyncStorage.
+
+No perfil, ative **Lembrete de captura** para receber “Bora capturar mais Pokémon?”
+a cada **1 minuto**. Desativar ou sair da conta cancela
+os agendamentos; a preferência é retomada no próximo login. São notificações locais,
+sem servidor de push, organizadas em `src/notifications`.
+
+Para apresentar no Android:
+1. Execute `npm install` e `npx expo start --android` com um Expo Go compatível com o SDK 57.
+2. Entre na conta, abra o perfil e ative **Lembrete de captura**.
+3. Autorize as notificações e vá para a tela inicial do celular, sem forçar a parada do app.
+4. Ao receber o aviso, toque para abrir a Pokédex. Se não houver sessão, faça login.
+
+O lembrete repete a cada 1 minuto. O Android pode atrasar a entrega por
+economia de bateria. Se usar uma build própria já instalada, gere uma nova build
+depois de adicionar os módulos nativos.
+
 ## Autenticacao
 
 Cadastro e login usam exclusivamente a API externa configurada em `EXPO_PUBLIC_AUTH_API_URL`. A sessao e mantida pelo cookie `HttpOnly` retornado pelo servidor; o aplicativo nao le nem armazena tokens de autenticacao.
